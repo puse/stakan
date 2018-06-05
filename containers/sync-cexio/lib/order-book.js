@@ -12,26 +12,58 @@ const createPool = require('./ws-pool')
  * Helpers
  */
 
-/**
- * Compile a subscribe message
- */
-
-const subscribeMsgFrom = ({ symbol, depth }, oid) => {
-  const pair = symbol
-    .toUpperCase()
-    .split('-')
-
-  const payload = {
-    e: 'order-book-subscribe',
-    data: {
-      pair,
-      depth,
-      subscribe: true
-    },
-    oid
+const shouldThrow = err => {
+  if (!err instanceof Error) {
+    err = new Error(err)
   }
 
-  return JSON.stringify(payload)
+  throw err
+}
+
+/**
+ * Actions
+ */
+
+async function subscribe (ws, { pair, depth }) {
+  const e = 'order-book-subscribe'
+  const oid = 'OB_OID:' + Date.now()
+
+  const data = {
+    pair,
+    depth,
+    subscribe: true
+  }
+
+  const msg = JSON.stringify({ e, data, oid })
+
+  const subscribe = resolve => {
+    ws.on(`origin:re:${oid}`, resolve)
+    ws.send(msg)
+  }
+
+  return new Promise(subscribe)
+}
+
+/**
+ *
+ */
+
+async function unsubscribe (ws, { pair }) {
+  const e = 'order-book-unsubscribe'
+  const oid = 'OB_OID:' + Date.now()
+
+  const data = {
+    pair
+  }
+
+  const msg = JSON.stringify({ e, data, oid })
+
+  const unsubscribe = resolve => {
+    ws.on(`origin:re:${oid}`, resolve)
+    ws.send(msg)
+  }
+
+  return new Promise(unsubscribe)
 }
 
 /**
@@ -45,18 +77,28 @@ const pool = createPool()
  */
 
 class OrderBook extends EventEmitter {
-  constructor (opts = {}) {
+  constructor (symbol, opts = {}) {
     super()
 
     const { depth = 20 } = opts
 
     this.broker = 'cexio'
+    this.symbol = symbol
 
-    this.depth = depth
+    this.depth  = depth
+
+    this.snapshot = this.snapshot.bind(this)
+    this.update   = this.update.bind(this)
   }
 
   get nextId () {
     return ++this.id
+  }
+
+  get pair () {
+    return this.symbol
+      .toUpperCase()
+      .split('-')
   }
 
   update (data) {
@@ -75,52 +117,58 @@ class OrderBook extends EventEmitter {
     this.emit('snapshot', { bids, asks })
   }
 
-  monitor () {
-    const { ws } = this
+  async sync (opts = {}) {
+    this.depth = opts.depth || this.depth
 
-    const snapshot = this.snapshot.bind(this)
-    const update   = this.update.bind(this)
-
-    ws.on('origin:order-book-subscribe', snapshot)
-    ws.on('origin:md_update', update)
-  }
-
-  async connect (symbol) {
     this.ws = await pool.acquire()
     this.emit('connected')
-  }
 
-  async subscribe (symbol) {
     const { ws } = this
 
-    this.symbol = symbol
+    // monitor
+    try {
+      ws.on('origin:error', shouldThrow)
 
-    this.monitor()
-
-    const subscribe = resolve => {
-      const oid = 'OB_OID:' + Date.now()
-      const msg = subscribeMsgFrom(this, oid)
-
-      ws.on(`origin:re:${oid}`, resolve)
-      ws.send(msg)
+      ws.on('origin:order-book-subscribe', this.snapshot)
+      ws.on('origin:md_update', this.update)
+    } catch (err) {
+      this.emit('error', err)
+      this.stop()
     }
 
-    return new Promise(subscribe)
+    // subscribe
+    await subscribe(ws, this)
+    this.emit('subscribed')
+
+    return this
   }
 
-  static of (symbol) {
+  async stop () {
+    const { ws } = this
 
+    await unsubscribe(ws, this)
+    this.emit('unsubscribed')
+
+    ws.close(1000, 'Unsubscribed')
+
+    await pool.release(ws)
+    this.emit('disconnected')
+  }
+
+  static of (symbol, opts) {
+    return new OrderBook(symbol, opts)
   }
 }
 
 
 async function run () {
-  const ob = new OrderBook()
+  const ob = new OrderBook('btc-usd')
 
   ob.on('update', console.log)
 
-  await ob.connect()
-  await ob.subscribe('btc-usd')
+  await ob.sync()
+
+  setTimeout(_ => ob.stop(), 2000)
 
   console.log('go')
 }

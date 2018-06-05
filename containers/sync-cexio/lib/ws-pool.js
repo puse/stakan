@@ -160,6 +160,10 @@ const monitor = ws => {
   // translate origin events
   ws.on('message', msg => {
     const { e, data, oid } = JSON.parse(msg)
+
+    const { error } = data || {}
+    if (error) ws.emit('origin:error', error)
+
     ws.emit(`origin:${e}`, data, oid)
     ws.emit(`origin:re:${oid}`, data, e)
   })
