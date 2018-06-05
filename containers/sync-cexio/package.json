@@ -1,0 +1,21 @@
+{
+  "name": "@alpinist-orderbook/sync-cexio",
+  "version": "0.0.1",
+  "description": "Sync Redis store with CEX.io orderbook",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "nodemon": "^1.17.5"
+  },
+  "dependencies": {
+    "getenv": "^0.7.0",
+    "ioredis": "^3.2.2",
+    "ramda": "^0.25.0",
+    "rxjs": "^6.2.0",
+    "rxjs-compat": "^6.2.0",
+    "ws": "^5.2.0"
+  }
+}
