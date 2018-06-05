@@ -111,7 +111,7 @@ const authFrom = (creds = CREDENTIALS) => {
  * @returns {string} - Stringified message ready to send
  */
 
-const messageFrom = (e, data, oid) => {
+const messageOf = (e, data, oid) => {
   const payload = {
     e,
     data,
@@ -119,6 +119,67 @@ const messageFrom = (e, data, oid) => {
   }
 
   return JSON.stringify(payload)
+}
+
+/**
+ * WS helpers
+ */
+
+const close = ws => {
+  log('Closing WS connection')
+  ws.close(1000, 'Expired')
+}
+
+/**
+ * Check if open
+ *
+ * @param {WebSocket} ws
+ *
+ * @returns {boolean}
+ */
+
+const isOpen = ws =>
+  ws.readyState === STATE_DICT['OPEN']
+
+/**
+ * Send heartbeat to origin
+ */
+
+const keepAlive = ws => {
+  const pong = _ => ws.send(messageOf('pong'))
+  ws.on('origin:ping', pong)
+}
+
+/**
+ * Monitor
+ */
+
+const monitor = ws => {
+  const out = x => _ => log(x)
+
+  // translate origin events
+  ws.on('message', msg => {
+    const { e, data, oid } = JSON.parse(msg)
+    ws.emit(`origin:${e}`, data, oid)
+    ws.emit(`origin:re:${oid}`, data, e)
+  })
+
+  // debug core events
+  ws.on('open', out('WS open'))
+  ws.on('close', code => log('WS closed with code %d', code))
+  ws.on('error', err => log('WS error: %s', ))
+
+  // debug origin events
+  ws.on('origin:connected', out('WS origin connected'))
+  ws.on('origin:disconnecting', out('WS origin disconnecting'))
+
+  ws.on('origin:auth', data => {
+    const { error } = data
+
+    error
+      ? log('WS origin auth error: %s', error)
+      : log('WS origin authenticated')
+  })
 }
 
 /**
@@ -134,18 +195,22 @@ const messageFrom = (e, data, oid) => {
  */
 
 async function connect (url = SERVER_URL) {
-  log('Connecting to %s', url)
+  let ws
 
-  const ws = new WebSocket(url)
+  try {
+    log('WS connecting to %s', url)
+    ws = new WebSocket(url)
+  } catch (err) {
+    log('WS create error: %s', err.message)
+    return Promise.reject(err)
+  }
+
+  monitor(ws)
+  keepAlive(ws)
 
   const cb = (resolve, reject) => {
-    const openHandler = _ => {
-      log('WS connected')
-      resolve(ws)
-    }
-
     try {
-      ws.on('open', openHandler)
+      ws.on('open', _ => resolve(ws))
     } catch (err) {
       log('Error while connecting: %s', err.message)
       reject(err)
@@ -160,35 +225,18 @@ async function connect (url = SERVER_URL) {
  */
 
 async function authenticate (ws) {
-  const e = 'auth'
-  const auth = authFrom(CREDENTIALS)
-
-  const msg = JSON.stringify({ e, auth })
-
-  log('Authenticating WS connection')
+  const msg = JSON.stringify({
+    e: 'auth',
+    auth: authFrom(CREDENTIALS)
+  })
 
   const cb = (resolve, reject) => {
-    const authHandler = msg => {
-      const { e, ok } = JSON.parse(msg)
+    ws.once('origin:auth', ({ error }) => {
+      if (!error) return resolve(ws)
 
-      // skip irrelevent messages
-      if (e !== 'auth') return void 0
-
-      ws.removeListener('message', authHandler)
-
-      if (ok === 'ok') {
-        log('Authenticated succesfully')
-        resolve(ws)
-      } else {
-        const message = 'Not authenticated'
-        const err = new Error(message)
-
-        log(message)
-        resolve(err)
-      }
-    }
-
-    ws.on('message', authHandler)
+      close(ws)
+      reject(new Error(error))
+    })
 
     ws.send(msg)
   }
@@ -205,6 +253,8 @@ async function authenticate (ws) {
  */
 
 async function create () {
+  log('Pool creating a WS client')
+
   return connect()
     .then(authenticate)
 }
@@ -214,11 +264,10 @@ async function create () {
  */
 
 async function destroy (ws) {
-  log('Closing WS')
-
+  log('Pool destroying a WS client')
   const close = resolve => {
-    ws.on('close', resolve)
-    ws.close(1000, 'Expired')
+    ws.once('close', resolve)
+    close('ws')
   }
 
   return new Promise(close)
@@ -229,11 +278,11 @@ async function destroy (ws) {
  */
 
 async function validate (ws) {
-  log('Validating before borrow')
+  log('Pool validation before borrow')
 
-  const ok = ws.readyState = STATE_DICT['OPEN']
+  const ok = isOpen(ws)
 
-  log('Validation result: %s', ok ? 'ok': 'failed')
+  log('Pool validation result: %s', ok ? 'ok': 'failed')
 
   return ok
 }

@@ -119,7 +119,7 @@ async function run () {
 
   await pool.release(ws1)
 
-  await new Promise(r => setTimeout(r, 60e3))
+  await new Promise(r => setTimeout(r, 1e3))
 
   const ws3 = await pool.acquire()
 
