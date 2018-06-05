@@ -1,8 +1,8 @@
+const debug = require('debug')('stakan:sync:cexio')
+
 const { createPool } = require('generic-pool')
 
 const { createHmac } = require('crypto')
-
-const debug = require('debug')
 
 const getenv = require('getenv')
 
@@ -55,8 +55,6 @@ const CREDENTIALS = getenv.multi({
  * Helpers
  */
 
-const log = debug('stakan:sync:cexio')
-
 /**
  * Create SHA256 HMAC
  *
@@ -106,7 +104,8 @@ const authFrom = (creds = CREDENTIALS) => {
  */
 
 const close = ws => {
-  log('Closing WS connection')
+  debug('Closing WS connection')
+
   ws.close(1000, 'Expired')
 }
 
@@ -126,23 +125,28 @@ const isOpen = ws =>
  */
 
 const monitor = ws => {
-  const out = x => _ => log(x)
+  const out = x => _ => debug(x)
 
   // translate origin events
   ws.on('message', msg => {
     const { e, data, oid } = JSON.parse(msg)
 
     const { error } = data || {}
-    if (error) ws.emit('origin:error', error)
 
-    ws.emit(`origin:${e}`, data, oid)
-    ws.emit(`origin:re:${oid}`, data, e)
+    if (error) {
+      ws.emit('origin:error', error)
+      ws.emit(`origin:${e}:error`, error)
+      ws.emit(`origin:re:${oid}:error`, error)
+    } else {
+      ws.emit(`origin:${e}`, data, oid)
+      ws.emit(`origin:re:${oid}`, data, e)
+    }
   })
 
   // debug core events
   ws.on('open', out('WS open'))
-  ws.on('close', code => log('WS closed with code %d', code))
-  ws.on('error', err => log('WS error: %s', ))
+  ws.on('close', code => debug('WS closed with code %d', code))
+  ws.on('error', err => debug('WS error: %s', ))
 
   // debug origin events
   ws.on('origin:connected', out('WS origin connected'))
@@ -152,8 +156,8 @@ const monitor = ws => {
     const { error } = data
 
     error
-      ? log('WS origin auth error: %s', error)
-      : log('WS origin authenticated')
+      ? debug('WS origin auth error: %s', error)
+      : debug('WS origin authenticated')
   })
 }
 
@@ -172,11 +176,13 @@ const monitor = ws => {
 async function connect (url = SERVER_URL) {
   let ws
 
+  debug('WS connecting to %s', url)
+
   try {
-    log('WS connecting to %s', url)
     ws = new WebSocket(url)
   } catch (err) {
-    log('WS create error: %s', err.message)
+    debug('WS create error: %s', err.message)
+
     return Promise.reject(err)
   }
 
@@ -186,7 +192,8 @@ async function connect (url = SERVER_URL) {
     try {
       ws.on('open', _ => resolve(ws))
     } catch (err) {
-      log('Error while connecting: %s', err.message)
+      debug('Error while connecting: %s', err.message)
+
       reject(err)
     }
   }
@@ -227,7 +234,7 @@ async function authenticate (ws) {
  */
 
 async function create () {
-  log('Pool creating a WS client')
+  debug('Pool creating a WS client')
 
   return connect()
     .then(authenticate)
@@ -238,7 +245,7 @@ async function create () {
  */
 
 async function destroy (ws) {
-  log('Pool destroying a WS client')
+  debug('Pool destroying a WS client')
   const close = resolve => {
     ws.once('close', resolve)
     close('ws')
@@ -252,11 +259,11 @@ async function destroy (ws) {
  */
 
 async function validate (ws) {
-  log('Pool validation before borrow')
+  debug('Pool validation before borrow')
 
   const ok = isOpen(ws)
 
-  log('Pool validation result: %s', ok ? 'ok': 'failed')
+  debug('Pool validation result: %s', ok ? 'ok': 'failed')
 
   return ok
 }

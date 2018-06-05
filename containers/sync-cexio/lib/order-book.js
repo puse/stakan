@@ -1,32 +1,16 @@
+const debug = require('debug')('stakan:sync:cexio')
+
 const { EventEmitter } = require('events')
 
 const assert = require('assert')
 
-const {
-  isNil
-} = require('ramda')
+const { isNil } = require('ramda')
 
 const createPool = require('./ws-pool')
 
 /**
  * Helpers
  */
-
-/**
- * Throw errors
- *
- * @param {Error|string} err
- *
- * @returns {Error}
- */
-
-const shouldThrow = err => {
-  if (!err instanceof Error) {
-    err = new Error(err)
-  }
-
-  throw err
-}
 
 /**
  * Message contructor
@@ -67,8 +51,12 @@ async function subscribe (ws, { pair, depth }) {
 
   const msg = messageOf('order-book-subscribe', data, oid)
 
-  const subscribe = resolve => {
-    ws.on(`origin:re:${oid}`, resolve)
+  const subscribe = (resolve, reject) => {
+    const topic = `origin:re:${oid}`
+
+    ws.on(topic, resolve)
+    ws.on(`${topic}:error`, reject)
+
     ws.send(msg)
   }
 
@@ -119,6 +107,11 @@ class OrderBook extends EventEmitter {
 
     this.snapshot = this.snapshot.bind(this)
     this.update   = this.update.bind(this)
+    this.error    = this.error.bind(this)
+    this.sync     = this.sync.bind(this)
+    this.stop     = this.stop.bind(this)
+
+    this.on('error', this.stop)
   }
 
   get nextId () {
@@ -129,6 +122,11 @@ class OrderBook extends EventEmitter {
     return this.symbol
       .toUpperCase()
       .split('-')
+  }
+
+  debug (msg, ...args) {
+    const { symbol } = this
+    debug(`Orderbook (%s) ${msg}`, symbol, ...args)
   }
 
   update (data) {
@@ -144,43 +142,95 @@ class OrderBook extends EventEmitter {
 
     this.id = id
 
+    this.debug('snapshot received')
     this.emit('snapshot', { bids, asks })
+  }
+
+  async error (err) {
+    err = err instanceof Error
+      ? err
+      : new Error(err)
+
+    this.debug('error: %s', err.message)
+    this.emit('error', err)
+
+    await this.stop()
+
+    return Promise.reject(err)
   }
 
   async sync (opts = {}) {
     this.depth = opts.depth || this.depth
 
-    this.ws = await pool.acquire()
-    this.emit('connected')
+    await pool
+      .acquire()
+      .then(ws => {
+        this.ws = ws
+
+        this.debug('connected')
+        this.emit('connected')
+      })
 
     const { ws } = this
 
     // monitor
     try {
-      ws.on('origin:error', shouldThrow)
-
       ws.on('origin:order-book-subscribe', this.snapshot)
       ws.on('origin:md_update', this.update)
+
     } catch (err) {
+      this.debug('error: %s', err)
       this.emit('error', err)
+
       this.stop()
     }
 
-    // subscribe
-    await subscribe(ws, this)
-    this.emit('subscribed')
+    await this.subscribe()
 
     return this
+  }
+
+  async subscribe () {
+    const { ws } = this
+
+    const op = _ => {
+      this._subscribed = true
+
+      this.debug('subscribed')
+      this.emit('subscribed')
+    }
+
+    return subscribe(ws, this)
+      .then(op)
+      .catch(this.error)
+  }
+
+  async unsubscribe () {
+    const { ws } = this
+
+    const op = _ => {
+      this._subscribe = false
+
+      this.debug('unsubscribed')
+      this.emit('unsubscribed')
+    }
+
+    return unsubscribe(ws, this)
+      .then(op)
+      .catch(this.error)
   }
 
   async stop () {
     const { ws } = this
 
-    await unsubscribe(ws, this)
-    this.emit('unsubscribed')
+    await this.unsubscribe()
 
     await pool.release(ws)
-    this.emit('disconnected')
+
+    this.debug('stopped')
+    this.emit('stop')
+
+    this.ws = null
   }
 
   static of (symbol, opts) {
@@ -194,7 +244,9 @@ async function run () {
 
   ob.on('update', console.log)
 
-  await ob.sync()
+  await ob
+    .sync()
+    .catch(console.log)
 
   setTimeout(_ => ob.stop(), 2000)
 }
