@@ -12,6 +12,14 @@ const createPool = require('./ws-pool')
  * Helpers
  */
 
+/**
+ * Throw errors
+ *
+ * @param {Error|string} err
+ *
+ * @returns {Error}
+ */
+
 const shouldThrow = err => {
   if (!err instanceof Error) {
     err = new Error(err)
@@ -21,11 +29,34 @@ const shouldThrow = err => {
 }
 
 /**
+ * Message contructor
+ *
+ * @param {string} e - scope identifier
+ * @param {Object} data - payload of message
+ * @param {string} [oid] - callback identifier
+ *
+ * @returns {string} - Stringified message ready to send
+ */
+
+const messageOf = (e, data, oid) => {
+  const payload = {
+    e,
+    data,
+    oid
+  }
+
+  return JSON.stringify(payload)
+}
+
+/**
  * Actions
  */
 
+/**
+ *
+ */
+
 async function subscribe (ws, { pair, depth }) {
-  const e = 'order-book-subscribe'
   const oid = 'OB_OID:' + Date.now()
 
   const data = {
@@ -34,7 +65,7 @@ async function subscribe (ws, { pair, depth }) {
     subscribe: true
   }
 
-  const msg = JSON.stringify({ e, data, oid })
+  const msg = messageOf('order-book-subscribe', data, oid)
 
   const subscribe = resolve => {
     ws.on(`origin:re:${oid}`, resolve)
@@ -49,14 +80,13 @@ async function subscribe (ws, { pair, depth }) {
  */
 
 async function unsubscribe (ws, { pair }) {
-  const e = 'order-book-unsubscribe'
   const oid = 'OB_OID:' + Date.now()
 
   const data = {
     pair
   }
 
-  const msg = JSON.stringify({ e, data, oid })
+  const msg = messageOf('order-book-unsubscribe', data, oid)
 
   const unsubscribe = resolve => {
     ws.on(`origin:re:${oid}`, resolve)
@@ -149,8 +179,6 @@ class OrderBook extends EventEmitter {
     await unsubscribe(ws, this)
     this.emit('unsubscribed')
 
-    ws.close(1000, 'Unsubscribed')
-
     await pool.release(ws)
     this.emit('disconnected')
   }
@@ -169,8 +197,6 @@ async function run () {
   await ob.sync()
 
   setTimeout(_ => ob.stop(), 2000)
-
-  console.log('go')
 }
 
 run()

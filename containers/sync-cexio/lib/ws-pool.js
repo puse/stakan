@@ -102,26 +102,6 @@ const authFrom = (creds = CREDENTIALS) => {
 }
 
 /**
- * Message contructor
- *
- * @param {string} e - scope identifier
- * @param {Object} data - payload of message
- * @param {string} [oid] - callback identifier
- *
- * @returns {string} - Stringified message ready to send
- */
-
-const messageOf = (e, data, oid) => {
-  const payload = {
-    e,
-    data,
-    oid
-  }
-
-  return JSON.stringify(payload)
-}
-
-/**
  * WS helpers
  */
 
@@ -140,15 +120,6 @@ const close = ws => {
 
 const isOpen = ws =>
   ws.readyState === STATE_DICT['OPEN']
-
-/**
- * Send heartbeat to origin
- */
-
-const keepAlive = ws => {
-  const pong = _ => ws.send(messageOf('pong'))
-  ws.on('origin:ping', pong)
-}
 
 /**
  * Monitor
@@ -210,7 +181,6 @@ async function connect (url = SERVER_URL) {
   }
 
   monitor(ws)
-  keepAlive(ws)
 
   const cb = (resolve, reject) => {
     try {
