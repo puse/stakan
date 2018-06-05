@@ -238,17 +238,8 @@ class OrderBook extends EventEmitter {
   }
 }
 
+/**
+ * Expose
+ */
 
-async function run () {
-  const ob = new OrderBook('btc-usd')
-
-  ob.on('update', console.log)
-
-  await ob
-    .sync()
-    .catch(console.log)
-
-  setTimeout(_ => ob.stop(), 2000)
-}
-
-run()
+module.exports = OrderBook
