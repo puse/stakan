@@ -42,31 +42,26 @@ const membersFrom = compose(
  */
 
 async function resetOrderBook (client, payload) {
-  const prefix = prefixFrom(payload)
+  const keys = keysOf(payload)
 
-  const bidsKey = `${prefix}:bids`
-  const bids    = membersFrom(payload.bids)
-
-  const asksKey = `${prefix}:asks`
-  const asks    = membersFrom(payload.asks)
-
-  const seqKey  = `${prefix}:seq`
   const seq     = Date.now() * 1000
-
-  const tsKey   = `${prefix}:ts`
   const ts      = Date.now()
 
   const recover = _ => {
     return merge(payload, { seq, ts })
   }
 
-  return client
-    .pipeline()
-      .set(seqKey, seq)
-      .set(tsKey, ts)
-      .del(bidsKey, asksKey)
-      .zadd(bidsKey, bids)
-      .zadd(asksKey, asks)
+  const io = client.pipeline()
+
+  io.set(keys.seq, seq)
+
+  io.set(keys.ts, ts)
+
+  io.del(keys.bids, keys.asks)
+    .zadd(keys.bids, membersFrom(payload.bids))
+    .zadd(keys.asks, membersFrom(payload.asks))
+
+  return io
     .exec()
     .then(recover)
 }

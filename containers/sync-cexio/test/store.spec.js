@@ -2,18 +2,14 @@ import test from 'ava'
 
 import Redis from 'ioredis'
 
-import {
-  resetOrderBook,
-  updateOrderBook,
-  getOrderBook
-} from '../lib/store/actions'
+import Store from '../lib/store'
 
-const client = new Redis()
+const store = new Store()
 
 test.serial('resetOrderBook', async t => {
   const SNAPSHOT = require('./assets/snapshot-formatted.json')
 
-  await resetOrderBook(client, SNAPSHOT)
+  await store.resetOrderBook(SNAPSHOT)
 
   t.pass()
 })
@@ -21,7 +17,7 @@ test.serial('resetOrderBook', async t => {
 test.serial('updateOrderBook', async t => {
   const UPDATE = require('./assets/update-formatted.json')
 
-  const res = await updateOrderBook(client, UPDATE)
+  const res = await store.updateOrderBook(UPDATE)
 
   t.not(res.seq, undefined)
 })
@@ -30,7 +26,12 @@ test.serial('getOrderBook', async t => {
   const broker = 'cexio'
   const symbol = 'exo-usd'
 
-  const res = await getOrderBook(client, { broker, symbol })
+  const res = await store.getOrderBook({ broker, symbol })
+
+  t.not(res.ts, undefined)
+
+  t.is(res.broker, broker)
+  t.is(res.symbol, symbol)
 
   t.deepEqual(res.bids, [
     [ 100, 2 ],
