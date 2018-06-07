@@ -4,9 +4,12 @@ const { EventEmitter } = require('events')
 
 const assert = require('assert')
 
-const { isNil } = require('ramda')
+const {
+  isNil,
+  merge
+} = require('ramda')
 
-const createPool = require('./ws-pool')
+const createPool = require('./pool')
 
 /**
  * Helpers
@@ -105,11 +108,11 @@ class OrderBook extends EventEmitter {
 
     this.depth  = depth
 
-    this.snapshot = this.snapshot.bind(this)
-    this.update   = this.update.bind(this)
-    this.error    = this.error.bind(this)
-    this.sync     = this.sync.bind(this)
-    this.stop     = this.stop.bind(this)
+    this.reset  = this.reset.bind(this)
+    this.update = this.update.bind(this)
+    this.reject = this.reject.bind(this)
+    this.sync   = this.sync.bind(this)
+    this.stop   = this.stop.bind(this)
 
     this.on('error', this.stop)
   }
@@ -124,9 +127,30 @@ class OrderBook extends EventEmitter {
       .split('-')
   }
 
+  publish (ev, data) {
+    const { broker, symbol } = this
+
+    const complete = merge({
+      ev,
+      broker,
+      symbol
+    })
+
+    this.emit(ev, complete(data))
+  }
+
   debug (msg, ...args) {
     const { symbol } = this
     debug(`Orderbook (%s) ${msg}`, symbol, ...args)
+  }
+
+  reset (data) {
+    const { id, bids, asks } = data
+
+    this.id = id
+
+    this.debug('snapshot received')
+    this.publish('reset', { bids, asks })
   }
 
   update (data) {
@@ -134,19 +158,10 @@ class OrderBook extends EventEmitter {
 
     assert(id === this.nextId, 'Inconsistent sequence')
 
-    this.emit('update', { bids, asks })
+    this.publish('update', { bids, asks })
   }
 
-  snapshot (data) {
-    const { id, bids, asks } = data
-
-    this.id = id
-
-    this.debug('snapshot received')
-    this.emit('snapshot', { bids, asks })
-  }
-
-  async error (err) {
+  async reject (err) {
     err = err instanceof Error
       ? err
       : new Error(err)
@@ -175,7 +190,7 @@ class OrderBook extends EventEmitter {
 
     // monitor
     try {
-      ws.on('origin:order-book-subscribe', this.snapshot)
+      ws.on('origin:order-book-subscribe', this.reset)
       ws.on('origin:md_update', this.update)
 
     } catch (err) {
@@ -202,7 +217,7 @@ class OrderBook extends EventEmitter {
 
     return subscribe(ws, this)
       .then(op)
-      .catch(this.error)
+      .catch(this.reject)
   }
 
   async unsubscribe () {
@@ -217,7 +232,7 @@ class OrderBook extends EventEmitter {
 
     return unsubscribe(ws, this)
       .then(op)
-      .catch(this.error)
+      .catch(this.reject)
   }
 
   async stop () {
