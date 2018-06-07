@@ -16,6 +16,7 @@
     "getenv": "^0.7.0",
     "ioredis": "^3.2.2",
     "ramda": "^0.25.0",
+    "ramda-adjunct": "^2.9.0",
     "rxjs": "^6.2.0",
     "rxjs-compat": "^6.2.0",
     "ws": "^5.2.0"
