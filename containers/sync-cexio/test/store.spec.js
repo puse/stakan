@@ -19,7 +19,8 @@ test.serial('updateOrderBook', async t => {
 
   const res = await store.updateOrderBook(UPDATE)
 
-  t.not(res.seq, undefined)
+  t.not(res.id, undefined)
+  t.not(res.ts, undefined)
 })
 
 test.serial('getOrderBook', async t => {
@@ -28,6 +29,7 @@ test.serial('getOrderBook', async t => {
 
   const res = await store.getOrderBook({ broker, symbol })
 
+  t.not(res.id, undefined)
   t.not(res.ts, undefined)
 
   t.is(res.broker, broker)

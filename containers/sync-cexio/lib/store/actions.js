@@ -25,8 +25,8 @@ const keysOf = target => {
   const prefix = `${broker}:${symbol}:orderbook`
 
   return {
+    id   : `${prefix}:id`,
     ts   : `${prefix}:ts`,
-    seq  : `${prefix}:seq`,
     bids : `${prefix}:bids`,
     asks : `${prefix}:asks`
   }
@@ -44,17 +44,16 @@ const membersFrom = compose(
 async function resetOrderBook (client, payload) {
   const keys = keysOf(payload)
 
-  const seq     = Date.now() * 1000
-  const ts      = Date.now()
+  const id = Date.now() * 1000
+  const ts = Date.now()
 
   const recover = _ => {
-    return merge(payload, { seq, ts })
+    return merge(payload, { id, ts })
   }
 
   const io = client.pipeline()
 
-  io.set(keys.seq, seq)
-
+  io.set(keys.id, id)
   io.set(keys.ts, ts)
 
   io.del(keys.bids, keys.asks)
@@ -70,15 +69,15 @@ async function updateOrderBook (client, payload) {
   const ts = Date.now()
 
   const recover = res => {
-    const [ seqErr, seq ] = res[0]
-    return merge(payload, { seq, ts })
+    const [ , id ] = res[0]
+    return merge(payload, { id, ts })
   }
 
   const keys = keysOf(payload)
 
   const io = client.pipeline()
 
-  io.incr(keys.seq)
+  io.incr(keys.id)
 
   io.set(keys.ts, ts)
 
@@ -104,14 +103,14 @@ async function getOrderBook (client, target) {
 
   const recover = res => {
     const [
-      [ , seq ],
+      [ , id ],
       [ , ts ],
       [ , bids ],
       [ , asks ]
     ] = res
 
     return merge(target, {
-      seq,
+      id,
       ts,
       bids: fromRespRev(bids),
       asks: fromResp(asks)
@@ -122,7 +121,7 @@ async function getOrderBook (client, target) {
 
   const io = client.pipeline()
 
-  io.get(keys.seq)
+  io.get(keys.id)
   io.get(keys.ts)
 
   io.zrangebyscore(keys.bids, '(0', '+inf', 'WITHSCORES')
