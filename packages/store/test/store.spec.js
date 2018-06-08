@@ -1,8 +1,6 @@
 import test from 'ava'
 
-import Redis from 'ioredis'
-
-import Store from '../lib/store'
+import Store from '..'
 
 const store = new Store()
 

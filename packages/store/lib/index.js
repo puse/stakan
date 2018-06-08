@@ -8,7 +8,7 @@ const actions = require('./actions')
 
 const REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379')
 
-function Store () {
+function Store (url = REDIS_URL) {
   const client = new Redis(REDIS_URL)
 
   return map(f => f(client), actions)

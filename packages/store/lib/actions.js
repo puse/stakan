@@ -1,23 +1,18 @@
 const {
-  head,
-  sortBy,
-  splitEvery,
-  merge,
+  compose,
   curry,
   flatten,
-  reverse,
+  head,
   map,
-  compose
+  merge,
+  reverse,
+  sortBy,
+  splitEvery
 } = require('ramda')
 
 /**
  * Helpers
  */
-
-const prefixFrom = payload => {
-  const { broker, symbol } = payload
-  return `${broker}:${symbol}:orderbook`
-}
 
 const keysOf = target => {
   const { broker, symbol } = target

@@ -1,0 +1,8 @@
+{
+  "lerna": "2.11.0",
+  "packages": [
+    "packages/*",
+    "containers/sync-cexio"
+  ],
+  "version": "independent"
+}

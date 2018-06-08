@@ -1,0 +1,17 @@
+{
+  "name": "@stakan/publisher",
+  "version": "0.0.1",
+  "description": "MQTT publisher",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "dependencies": {
+    "debug": "^3.1.0",
+    "getenv": "^0.7.0",
+    "mqtt": "^2.18.0",
+    "ramda": "^0.25.0",
+    "rxjs": "^6.2.0",
+    "rxjs-compat": "^6.2.0"
+  }
+}

@@ -1,7 +1,4 @@
-const {
-  Observable,
-  Subject
-} = require('rxjs/Rx')
+const { Observable } = require('rxjs/Rx')
 
 const {
   assoc,
@@ -17,15 +14,17 @@ const {
   isNotEmpty
 } = require('ramda-adjunct')
 
-const Store = require('./lib/store')
-const Remote = require('./lib/remote')
-const Channel = require('./lib/channel')
+const Store = require('@stakan/store')
+const Publisher = require('@stakan/publisher')
+
+const Remote = require('./lib')
 
 const OBH = require('./lib/helpers')
 
 const store = new Store()
+const publisher = new Publisher()
+
 const remote = new Remote('btc-usd')
-const channel = new Channel()
 
 const close$ = Observable
   .fromEvent(remote, 'close')
@@ -62,6 +61,8 @@ reset$
       ? store.resetOrderBook(x)
       : store.updateOrderBook(x)
   })
-  .subscribe(channel)
+  .subscribe(
+    x => publisher.publish(x)
+  )
 
 remote.sync()
