@@ -9,3 +9,8 @@ services:
     ports:
       - "6379:6379"
 
+  mosquitto:
+    image: toke/mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"

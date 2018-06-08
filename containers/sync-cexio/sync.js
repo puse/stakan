@@ -19,11 +19,13 @@ const {
 
 const Client = require('./lib/client')
 const Store = require('./lib/store')
+const Channel = require('./lib/channel')
 
 const OBH = require('./lib/helpers')
 
 const client = new Client('btc-usd')
 const store = new Store()
+const channel = new Channel()
 
 const input$ = new Subject()
 
@@ -55,9 +57,9 @@ reset$
       ? store.resetOrderBook(x)
       : store.updateOrderBook(x)
   })
-  .subscribe(ingest)
+  .subscribe(channel)
 
-
+//
 function ingest (x) {
   console.log(x)
 }
