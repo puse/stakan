@@ -17,7 +17,7 @@ const {
   isNotEmpty
 } = require('ramda-adjunct')
 
-const Store = require('./lib/store')
+const Store = require('@stakan/store')
 const Remote = require('./lib/remote')
 const Channel = require('./lib/channel')
 
