@@ -1,9 +1,10 @@
 {
-  "name": "@alpinist-orderbook/sync-cexio",
+  "name": "@stakan/sync-cexio",
   "version": "0.0.1",
   "description": "Sync Redis store with CEX.io orderbook",
   "main": "lib/index.js",
   "scripts": {
+    "dev": "nodemon sync.js",
     "test": "ava"
   },
   "devDependencies": {
