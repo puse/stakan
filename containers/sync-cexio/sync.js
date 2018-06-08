@@ -1,7 +1,4 @@
-const {
-  Observable,
-  Subject
-} = require('rxjs/Rx')
+const { Observable } = require('rxjs/Rx')
 
 const {
   assoc,
@@ -20,7 +17,7 @@ const {
 const Store = require('@stakan/store')
 const Publisher = require('@stakan/publisher')
 
-const Remote = require('./lib/remote')
+const Remote = require('./lib')
 
 const OBH = require('./lib/helpers')
 

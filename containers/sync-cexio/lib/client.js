@@ -1,25 +1,14 @@
 const debug = require('debug')('stakan:sync:cexio')
 
-const { createPool } = require('generic-pool')
-
-const { createHmac } = require('crypto')
-
 const getenv = require('getenv')
 
 const WebSocket = require('ws')
 
+const { hmacFrom } = require('./crypto')
+
 /**
  * Constants
  */
-
-/**
- * Pool config
- */
-
-const CONFIG = {
-  max: 2,
-  testOnBorrow: true
-}
 
 /**
  * CEX.IO WebSocket API URL
@@ -54,22 +43,6 @@ const CREDENTIALS = getenv.multi({
 /**
  * Helpers
  */
-
-/**
- * Create SHA256 HMAC
- *
- * @param {string} key
- * @param {string} message
- *
- * @returns {string} - hex digest
- */
-
-const hmacFrom = (key, msg) => {
-  const hmac = createHmac('sha256', key)
-  hmac.update(msg)
-
-  return hmac.digest('hex')
-}
 
 /**
  * CEX.IO specific `auth` object
@@ -273,25 +246,11 @@ async function validate (ws) {
 }
 
 /**
- * Pool constructor
- *
- * @param {Object} [opts] - Options for `generic-pool`
- *
- * @returns {Pool}
+ * Expose factory methods
  */
 
-function Pool (opts = CONFIG) {
-  const factory = {
-    create,
-    destroy,
-    validate
-  }
-
-  return createPool(factory, opts)
+module.exports = {
+  create,
+  destroy,
+  validate
 }
-
-/**
- * Expose constructor
- */
-
-module.exports = Pool
