@@ -132,10 +132,12 @@ class Remote extends EventEmitter {
     this.debug('closing')
     this.emit('close')
 
+    this.removeAllListeners()
+
     this.ws = null
   }
 
-  publish (ev, data) {
+  publish (ev, data = {}) {
     const { broker, symbol } = this
 
     const complete = merge({
@@ -155,11 +157,17 @@ class Remote extends EventEmitter {
   monitor () {
     const { ws } = this
 
+    // keep alive
+    ws.on('origin:ping', _ => {
+      this.debug('keep alive')
+      ws.send(messageOf('pong'))
+    })
+
+    ws.on('origin:disconnecting', this.close)
+
     try {
       ws.on('origin:order-book-subscribe', this.reset)
       ws.on('origin:md_update', this.update)
-
-      ws.on('origin:disconnecting', this.close)
     } catch (err) {
       this.debug('error: %s', err)
       this.emit('error', err)

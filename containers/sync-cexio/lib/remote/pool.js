@@ -133,7 +133,9 @@ const monitor = ws => {
 
     const { error } = data || {}
 
-    // console.log(e)
+    if (e === 'ping') {
+      debug('WS ping received')
+    }
 
     if (error) {
       ws.emit('origin:error', error)
