@@ -21,36 +21,49 @@ const request = Axios.create({
 
 const client = mqtt.connect('ws://localhost:9001')
 
-function streamState () {
-  client.subscribe('orderbook/cexio/btc-usd')
+client.subscribe('orderbook/cexio/btc-usd')
 
-  const selector = (_, message) => {
-    return JSON.parse(message)
-  }
+const snapshotP = new Promise(r => client.on('connect', r))
+  .then(_ => request('orderbooks/cexio/btc-usd'))
+  .then(x => x.data)
 
-  const resetP = request('/orderbooks/cexio/btc-usd')
-  const reset$ = Observable
-    .fromPromise(resetP)
+const update$ = new ReplaySubject()
 
-  reset$
-    .subscribe(console.log)
+Observable
+  .fromEvent(client, 'message', (_, m) => m)
+  .map(JSON.parse)
+  .subscribe(update$)
 
-  const update$ = new ReplaySubject()
+async function streamMembersP (key) {
+  const snapshot = await snapshotP
 
-  Observable
-    .fromEvent(client, 'message', selector)
-    .subscribe(update$)
+  const isPrev = x =>
+    Number(snapshot.id) === Number(x.id)
 
-  const bids$ = update$
-    .map(prop('bids'))
+  const next$ = update$
+    .skipWhile(isPrev)
+
+  return Observable
+    .of(snapshot)
+    .merge(next$)
+    .map(prop(key))
     .map(fromPairs)
     .scan(merge)
     .map(toPairs)
     .map(filter(x => x[1] > 0))
+}
 
+function streamMembers (key) {
+  return Observable
+    .fromPromise(streamMembersP(key))
+    .flatMap(x => x)
+}
+
+function subscriptions () {
   return {
-    bids: bids$
+    bids: streamMembers('bids'),
+    asks: streamMembers('asks')
   }
 }
 
-export default streamState
+export default subscriptions

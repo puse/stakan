@@ -1,28 +1,52 @@
 <template lang="pug">
 el-table(
   border
-  :data="dataset")
+  height="485"
+  :data="members")
 
-  el-table-column(label="Price")
-    template(slot-scope="scope")
-      | {{ scope.row[0] }}
+  el-table-column(
+    label="Price"
+    prop="price"
+    :sortable="true")
 
-  el-table-column(label="Quantity")
-    template(slot-scope="scope")
-      | {{ scope.row[1] }}
-
-  el-table-column(label="Total")
-    template(slot-scope="scope")
-      | {{ scope.row[0] * scope.row[1] }}
+  el-table-column(
+    label="Quantity"
+    prop="quantity")
 </template>
 
 <script>
+
+import {
+  map,
+  compose,
+  sortBy,
+  prop,
+  zipObj,
+  reverse
+} from 'ramda'
+
+const computed = {
+  members () {
+    const zipped = zipObj(['price', 'quantity'])
+
+    const op = compose(
+      reverse,
+      sortBy(prop('price')),
+      map(zipped),
+      map(map(Number))
+    )
+
+    return op(this.dataset)
+  }
+}
+
 const props = {
   dataset: Array
 }
 
 export default {
   name: 'orderbook-table',
-  props
+  props,
+  computed
 }
 </script>
