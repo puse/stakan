@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+
+import Orderbook from '@/views/orderbook'
 
 Vue.use(Router)
 
@@ -8,8 +9,17 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      redirect: {
+        name: 'orderbook',
+        params: {
+          broker: 'cexio',
+          symbol: 'btc-usd'
+        }
+      }
+    }, {
+      name: 'orderbook',
+      path: '/orderbook/:broker/:symbol',
+      component: Orderbook
     }
   ]
 })

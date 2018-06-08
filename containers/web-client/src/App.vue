@@ -2,8 +2,8 @@
   el-container
     el-header
       | Exo
-    el-main
-      router-view.wrapper
+    el-main.wrapper
+      router-view
 </template>
 
 <script>
