@@ -133,6 +133,8 @@ const monitor = ws => {
 
     const { error } = data || {}
 
+    // console.log(e)
+
     if (error) {
       ws.emit('origin:error', error)
       ws.emit(`origin:${e}:error`, error)

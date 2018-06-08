@@ -97,7 +97,7 @@ const pool = createPool()
  *
  */
 
-class OrderBook extends EventEmitter {
+class Remote extends EventEmitter {
   constructor (symbol, opts = {}) {
     super()
 
@@ -113,6 +113,7 @@ class OrderBook extends EventEmitter {
     this.reject = this.reject.bind(this)
     this.sync   = this.sync.bind(this)
     this.stop   = this.stop.bind(this)
+    this.close  = this.close.bind(this)
 
     this.on('error', this.stop)
   }
@@ -125,6 +126,13 @@ class OrderBook extends EventEmitter {
     return this.symbol
       .toUpperCase()
       .split('-')
+  }
+
+  close () {
+    this.debug('closing')
+    this.emit('close')
+
+    this.ws = null
   }
 
   publish (ev, data) {
@@ -141,7 +149,23 @@ class OrderBook extends EventEmitter {
 
   debug (msg, ...args) {
     const { symbol } = this
-    debug(`Orderbook (%s) ${msg}`, symbol, ...args)
+    debug(`Remote (%s) ${msg}`, symbol, ...args)
+  }
+
+  monitor () {
+    const { ws } = this
+
+    try {
+      ws.on('origin:order-book-subscribe', this.reset)
+      ws.on('origin:md_update', this.update)
+
+      ws.on('origin:disconnecting', this.close)
+    } catch (err) {
+      this.debug('error: %s', err)
+      this.emit('error', err)
+
+      this.stop()
+    }
   }
 
   reset (data) {
@@ -177,32 +201,21 @@ class OrderBook extends EventEmitter {
   async sync (opts = {}) {
     this.depth = opts.depth || this.depth
 
-    await pool
-      .acquire()
-      .then(ws => {
-        this.ws = ws
+    const start = ws => {
+      this.ws = ws
 
-        this.debug('connected')
-        this.emit('connected')
-      })
+      this.debug('connected')
+      this.emit('connected')
 
-    const { ws } = this
+      this.subscribe()
+      this.monitor()
 
-    // monitor
-    try {
-      ws.on('origin:order-book-subscribe', this.reset)
-      ws.on('origin:md_update', this.update)
-
-    } catch (err) {
-      this.debug('error: %s', err)
-      this.emit('error', err)
-
-      this.stop()
+      return this
     }
 
-    await this.subscribe()
-
-    return this
+    return  pool
+      .acquire()
+      .then(start)
   }
 
   async subscribe () {
@@ -236,20 +249,15 @@ class OrderBook extends EventEmitter {
   }
 
   async stop () {
-    const { ws } = this
-
     await this.unsubscribe()
 
     await pool.release(ws)
 
-    this.debug('stopped')
-    this.emit('stop')
-
-    this.ws = null
+    return this.close()
   }
 
   static of (symbol, opts) {
-    return new OrderBook(symbol, opts)
+    return new Remote(symbol, opts)
   }
 }
 
@@ -257,4 +265,4 @@ class OrderBook extends EventEmitter {
  * Expose
  */
 
-module.exports = OrderBook
+module.exports = Remote

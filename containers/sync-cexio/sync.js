@@ -17,23 +17,23 @@ const {
   isNotEmpty
 } = require('ramda-adjunct')
 
-const Client = require('./lib/client')
 const Store = require('./lib/store')
+const Remote = require('./lib/remote')
 const Channel = require('./lib/channel')
 
 const OBH = require('./lib/helpers')
 
-const client = new Client('btc-usd')
 const store = new Store()
+const remote = new Remote('btc-usd')
 const channel = new Channel()
 
 const input$ = new Subject()
 
 const reset$ = Observable
-  .fromEvent(client, 'reset')
+  .fromEvent(remote, 'reset')
 
 const update$ = Observable
-  .fromEvent(client, 'update')
+  .fromEvent(remote, 'update')
   .bufferTime(25)
   .filter(isNotEmpty)
   .map(arr => {
@@ -64,4 +64,4 @@ function ingest (x) {
   console.log(x)
 }
 
-client.sync()
+remote.sync()
