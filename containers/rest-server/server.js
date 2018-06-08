@@ -20,9 +20,9 @@ const PORT = getenv.int('NODE_PORT', 8080)
 
 const app = new Koa()
 
-app.use(logger)
+app.use(logger())
 
-app.use(router)
+app.use(router())
 
 app.listen(PORT, _ => {
   debug('Server is listening to %d', PORT)
