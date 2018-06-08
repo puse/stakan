@@ -56,6 +56,8 @@ async function create (url = MQTT_URL) {
 
   const client = mqtt.connect(url)
 
+  monitor(client)
+
   const connected = (resolve, reject) => {
     client.once('connect', resolve)
     client.once('error', reject)
@@ -70,7 +72,7 @@ async function create (url = MQTT_URL) {
  */
 
 async function destroy (client) {
-  debug('Pool destroying a mqtt client')
+  debug('Pool destroying a MQTT client')
 
   const close = resolve => {
     client.end(false, resolve)

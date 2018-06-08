@@ -44,12 +44,9 @@ async function publish (client, payload) {
 }
 
 async function tearDown (client) {
-  const ended = resolve =>
-    client.end(false, resolve)
+  debug('Channel is disconnecting')
 
-  debug('Disconnecting')
-
-  return new Promise(ended)
+  return pool.release(client)
 }
 
 function asObserver (client) {
@@ -81,12 +78,10 @@ function Channel () {
       tearDown(client)
     }
 
-    const complete = _ => {
-      debug('Completed')
+    const complete = _ =>
       tearDown(client)
-    }
 
-    return subject.subscribe(next)
+    return subject.subscribe(next, error, complete)
   }
 
   pool

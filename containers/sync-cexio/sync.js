@@ -27,13 +27,16 @@ const store = new Store()
 const remote = new Remote('btc-usd')
 const channel = new Channel()
 
-const input$ = new Subject()
+const close$ = Observable
+  .fromEvent(remote, 'close')
 
 const reset$ = Observable
   .fromEvent(remote, 'reset')
+  .takeUntil(close$)
 
 const update$ = Observable
   .fromEvent(remote, 'update')
+  .takeUntil(close$)
   .bufferTime(25)
   .filter(isNotEmpty)
   .map(arr => {
@@ -50,6 +53,8 @@ const update$ = Observable
     return op(arr)
   })
 
+const noop = x => x
+
 reset$
   .merge(update$)
   .flatMap(x => {
@@ -58,10 +63,5 @@ reset$
       : store.updateOrderBook(x)
   })
   .subscribe(channel)
-
-//
-function ingest (x) {
-  console.log(x)
-}
 
 remote.sync()
