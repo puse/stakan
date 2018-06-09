@@ -6,13 +6,13 @@
         h3 Sell orders
         orderbook-table(
           v-if="asks"
-          :dataset="asks")
+          :dataset="asksData")
 
       el-col(:span="12")
         h3 Buy orders
         orderbook-table(
           v-if="bids"
-          :dataset="bids")
+          :dataset="bidsData")
 </template>
 
 <script src="./main.js"></script>

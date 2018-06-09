@@ -12,6 +12,7 @@ el-table(
   el-table-column(
     label="Quantity"
     prop="quantity")
+
 </template>
 
 <script>
@@ -19,10 +20,10 @@ el-table(
 import {
   map,
   compose,
-  sortBy,
   prop,
   zipObj,
-  reverse
+  reverse,
+  applySpec
 } from 'ramda'
 
 const computed = {
@@ -30,13 +31,11 @@ const computed = {
     const zipped = zipObj(['price', 'quantity'])
 
     const op = compose(
-      reverse,
-      sortBy(prop('price')),
       map(zipped),
-      map(map(Number))
+      prop('dataset')
     )
 
-    return op(this.dataset)
+    return op(this)
   }
 }
 

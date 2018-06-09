@@ -8,11 +8,14 @@ import Axios from 'axios'
 import mqtt from 'mqtt'
 
 import {
+  compose,
+  map,
   prop,
   merge,
   fromPairs,
   toPairs,
-  filter
+  filter,
+  sortBy
 } from 'ramda'
 
 const request = Axios.create({
@@ -43,14 +46,23 @@ async function streamMembersP (key) {
   const next$ = update$
     .skipWhile(isPrev)
 
+  const asDict = compose(
+    fromPairs,
+    prop(key)
+  )
+
+  const recover = compose(
+    map(map(Number)),
+    filter(x => x[1] > 0),
+    toPairs
+  )
+
   return Observable
     .of(snapshot)
     .merge(next$)
-    .map(prop(key))
-    .map(fromPairs)
+    .map(asDict)
     .scan(merge)
-    .map(toPairs)
-    .map(filter(x => x[1] > 0))
+    .map(recover)
 }
 
 function streamMembers (key) {
