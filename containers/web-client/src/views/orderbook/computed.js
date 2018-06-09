@@ -15,7 +15,7 @@ function bidsData () {
     prop('bids')
   )
 
-  return op(this)
+  return op(this.stream)
 }
 
 function asksData () {
@@ -24,7 +24,7 @@ function asksData () {
     prop('asks')
   )
 
-  return op(this)
+  return op(this.stream)
 }
 
 export {

@@ -1,4 +1,5 @@
 import {
+  Subject,
   Observable,
   ReplaySubject
 } from 'rxjs/Rx'
@@ -18,63 +19,73 @@ import {
   sortBy
 } from 'ramda'
 
-const request = Axios.create({
-  baseURL: '/api'
-})
+const request = Axios.create({ baseURL: '/api' })
 
 const client = mqtt.connect('ws://localhost:9001')
 
 client.subscribe('orderbook/cexio/btc-usd')
 
-const snapshotP = new Promise(r => client.on('connect', r))
-  .then(_ => request('orderbooks/cexio/btc-usd'))
-  .then(x => x.data)
-
+const snapshot$ = new ReplaySubject()
 const update$ = new ReplaySubject()
+const source$ = new ReplaySubject()
+
+Observable
+  .fromEvent(client, 'message')
+  .take(1)
+  .flatMap(_ => request('orderbooks/cexio/btc-usd'))
+  .map(prop('data'))
+  .subscribe(snapshot$)
 
 Observable
   .fromEvent(client, 'message', (_, m) => m)
   .map(JSON.parse)
   .subscribe(update$)
 
-async function streamMembersP (key) {
-  const snapshot = await snapshotP
+update$.subscribe(console.log)
 
-  const isPrev = x =>
-    Number(snapshot.id) === Number(x.id)
+//
 
-  const next$ = update$
-    .skipWhile(isPrev)
+const switchRelevant = pair => {
+  const [ snapshot, update ] = pair
 
-  const asDict = compose(
-    fromPairs,
-    prop(key)
-  )
-
-  const recover = compose(
-    map(map(Number)),
-    filter(x => x[1] > 0),
-    toPairs
-  )
-
-  return Observable
-    .of(snapshot)
-    .merge(next$)
-    .map(asDict)
-    .scan(merge)
-    .map(recover)
+  return snapshot.id < update.id
+    ? update
+    : snapshot
 }
 
-function streamMembers (key) {
-  return Observable
-    .fromPromise(streamMembersP(key))
-    .flatMap(x => x)
+const datasetFromDict = compose(
+  map(map(Number)),
+  filter(x => x[1] > 0),
+  toPairs
+)
+
+const commitToAcc = (prev, next) => {
+  const bids = merge(
+    fromPairs(prev.bids),
+    fromPairs(next.bids)
+  )
+
+  const asks = merge(
+    fromPairs(prev.asks),
+    fromPairs(next.asks)
+  )
+
+  return {
+    id: next.id,
+    ts: next.ts,
+    bids: datasetFromDict(bids),
+    asks: datasetFromDict(asks)
+  }
 }
 
 function subscriptions () {
+  const stream$ = Observable
+    .combineLatest(snapshot$, update$)
+    .map(switchRelevant)
+    .scan(commitToAcc)
+
   return {
-    bids: streamMembers('bids'),
-    asks: streamMembers('asks')
+    stream: stream$
   }
 }
 

@@ -5,13 +5,13 @@
       el-col(:span="12")
         h3 Sell orders
         orderbook-table(
-          v-if="asks"
+          v-if="stream"
           :dataset="asksData")
 
       el-col(:span="12")
         h3 Buy orders
         orderbook-table(
-          v-if="bids"
+          v-if="stream"
           :dataset="bidsData")
 </template>
 
