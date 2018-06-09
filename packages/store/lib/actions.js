@@ -105,8 +105,9 @@ async function getOrderBook (client, target) {
     ] = res
 
     return merge(target, {
-      id,
-      ts,
+      id  : Number(id),
+      ts  : Number(ts),
+      ev  : 'snapshot',
       bids: fromRespRev(bids),
       asks: fromResp(asks)
     })
