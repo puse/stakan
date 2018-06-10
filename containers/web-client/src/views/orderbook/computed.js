@@ -3,10 +3,10 @@ import {
   reverse,
   compose,
   sortBy,
-  nth
+  head
 } from 'ramda'
 
-const sortedByPrice = sortBy(nth(0))
+const sortedByPrice = sortBy(head)
 
 function bidsData () {
   const op = compose(
