@@ -45,12 +45,16 @@
       5) "amount"
       6) "8.2"
 ```
-#### `OBFEED [COUNT count] [BLOCK milliseconds] key`
+#### `OBIMPORT key [start] [end]`
 
 ```
-> OBFEED COUNT 100 BLOCK 2000 cexio:xmr-usd
+> OBIMPORT cexio:xmr-usd 
 
 1) "1530060819000-2"
+
+> OBIMPORT cexio:xmr-usd 
+
+1) nil
 ```
 
 ### `OBDEPTH key [DEPTH depth] [WITHAMOUNTS]`
@@ -62,5 +66,4 @@
    2) "88"
 2) 1) "121"
    2) "8.2"
-
 ```
