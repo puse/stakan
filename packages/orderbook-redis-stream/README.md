@@ -20,13 +20,13 @@
 
 ## API
 
-#### `OBSTREAM key seed price amount [price amount]`
+#### `OBLOG key seed price amount [price amount]`
 
 ```
-> OBSTREAM cexio:xmr-usd 1530060819000 -120 88 121 8.2
+> OBLOG cexio:xmr-usd 1530060819000 -120 88 121 8.2
 
-1) 1) 1526985054069-1
-   2) 1526985054069-2
+1) 1526985054069-1
+2) 1526985054069-2
 
 > XRANGE cexio:xmr-usd 1530060819000 +
 
