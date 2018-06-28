@@ -6,16 +6,6 @@ local set = function (key, val)
   return redis.call("SET", key, val)
 end
 
-local xrange = function (key, from, to)
-  from = from or "0-0"
-  to = to or "+"
-  return redis.call("XRANGE", key, from, to)
-end
-
-local zadd = function (key, ...)
-  return redis.call("ZADD", key, unpack(arg))
-end
-
 --
 
 local prefixed = function (sub)
@@ -69,12 +59,10 @@ local tear_down = function ()
 end
 
 local pull = function ()
-  redis.debug(rev_x)
-
   local from = ARGV[1] or next_rev_of(rev_x) or '0-0'
-  local to   = ARGV[2]
+  local to   = ARGV[2] or "+"
 
-  local res = xrange(prefixed "log", from, to)
+  local res = redis.call("XRANGE", prefixed "log", from, to)
 
   local revs = {}
   local entries = {}
@@ -88,9 +76,17 @@ local pull = function ()
 end
 
 
-local commit = function (entry)
-  local key = prefixed("agg:" .. entry.side)
-  return zadd(key, entry.amount, entry.price)
+local commit = function (side, data)
+  local key = prefixed("agg:" .. side)
+  local arg = {}
+
+  for k,v in pairs(data) do
+    table.insert(arg, v)
+    table.insert(arg, k)
+  end
+
+  redis.call("ZADD", key, unpack(arg))
+  redis.call("ZREMRANGEBYSCORE", key, "-inf", 0)
 end
 
 local touch = function (rev)
@@ -101,6 +97,8 @@ end
 
 local entries, revs = pull()
 
+--
+
 local rev_prev = rev_x
 
 local nth = nil
@@ -108,13 +106,14 @@ local nth = nil
 for i, r in pairs(revs) do
   local seed, offset = split_rev(r)
 
-  if rev_prev then
+  if not rev_prev and offset == 1 then
+    nth = i
+    rev_prev = r
+  elseif rev_prev then
     local seed_prev, offset_prev = split_rev(rev_prev)
 
     local is_next = r == next_rev_of(rev_prev)
     local is_next_seed = seed > seed_prev and offset == 1
-
-    redis.debug(rev_prev, r, is_next)
 
     if is_next then
       if not nth then nth = i end
@@ -123,27 +122,36 @@ for i, r in pairs(revs) do
       nth = i
       rev_prev = r
       tear_down()
-    else
-
     end
+  end
+end
+
+--
+
+if not nth then return nil end
+
+--
+
+local bids = {}
+local asks = {}
+
+for i = nth, #entries do
+  local entry = entries[i]
+
+  if entry.side == "bids" then
+    bids[entry.price] = entry.amount
   else
-    if offset == 1 then
-      nth = i
-      rev_prev = r
-    end
+    asks[entry.price] = entry.amount
   end
 end
 
-if nth then
-  for i = nth, #entries do
-    commit(entries[i])
-  end
+commit("bids", bids)
+commit("asks", asks)
 
-  local rev = revs[#revs]
+--
 
-  set(prefixed "agg:rev", rev)
+local rev = revs[#revs]
 
-  return rev
-else
-  return redis.error_reply("Inconsistent revs")
-end
+set(prefixed "agg:rev", rev)
+
+return rev
