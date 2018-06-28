@@ -1,4 +1,4 @@
-local PREFIX = "OB:"
+local PREFIX = "ob:"
 
 local TOPIC = KEYS[1]
 local SEED  = table.remove(ARGV, 1)
@@ -38,7 +38,7 @@ for i = 1, #ARGV, 2 do
   local rate = tonumber(ARGV[i])
   local amount = tonumber(ARGV[i+1])
 
-  local side = rate < 0 and "bid" or "ask"
+  local side = rate < 0 and "bids" or "asks"
   local price = math.abs(rate)
 
   local id = insert {
