@@ -20,10 +20,10 @@
 
 ## API
 
-#### `OBLOG key seed price amount [price amount]`
+#### `OBLOG key seed BIDS price amount ASKS price amount`
 
 ```
-> OBLOG cexio:xmr-usd 1530060819000 -120 88 121 8.2
+> OBLOG cexio:xmr-usd 1530060819000 BIDS 120 88 ASKS 121 8.2
 
 1) 1526985054069-1
 2) 1526985054069-2

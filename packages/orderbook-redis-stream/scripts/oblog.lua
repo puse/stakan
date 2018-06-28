@@ -17,7 +17,7 @@ end
 --
 
 local insert = function (data)
-  -- kes
+  --
   local root = PREFIX .. TOPIC
 
   local key_log = root .. ":log"
@@ -33,19 +33,31 @@ end
 
 local ids = {}
 
--- take each 2 as { rate, amount } pair
-for i = 1, #ARGV, 2 do
-  local rate = tonumber(ARGV[i])
-  local amount = tonumber(ARGV[i+1])
+-- take each 2 as { price, amount } pair
 
-  local side = rate < 0 and "bids" or "asks"
-  local price = math.abs(rate)
+local bids = {}
+local asks = {}
+
+local i = 1
+local l = #ARGV
+
+local side = nil
+
+while i <= l do
+  local x = string.lower(ARGV[i])
+
+  if x == 'bids' or x == 'asks' then
+    side = x
+    i = i + 1
+  end
 
   local id = insert {
     "side", side,
-    "price", price,
-    "amount", amount
+    "price", ARGV[i],
+    "amount", ARGV[i + 1]
   }
+
+  i = i + 2
 
   table.insert(ids, id)
 end
