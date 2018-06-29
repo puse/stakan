@@ -1,18 +1,63 @@
-local get = function (key)
-  return redis.call("GET", key)
+-- Constants
+
+local KEY_ROOT = "ob"
+
+-- Utils
+
+local join_by = function (split)
+  return function (tbl)
+    return table.concat(tbl, split)
+  end
 end
 
-local set = function (key, val)
-  return redis.call("SET", key, val)
+local insert_into = function (tbl)
+  return function (...)
+    for i = 1, #arg do
+      table.insert(tbl, arg[i])
+    end
+  end
+end
+
+local is_table = function (x)
+  return type(x) == "table"
+end
+
+local flatten = function (tbl)
+  local out = {}
+
+  local push = insert_into(out)
+
+  local function f (t)
+    for i = 1, #t do
+      local v = t[i]
+      if is_table(v) then f(v) else push(v) end
+    end
+  end
+
+  f(tbl)
+
+  return out
+end
+
+-- Redis helpers
+
+local function command (cmd)
+  return function (...)
+    local params = flatten(arg)
+    return redis.call(cmd, unpack(params))
+  end
 end
 
 --
 
-local prefixed = function (sub)
-  local PREFIX = "ob"
-  local TOPIC  = KEYS[1]
+local function keyfor (sub)
+  local join = join_by ":"
 
-  return table.concat({ PREFIX, TOPIC, sub }, ":")
+  if sub == "log" then
+    return join { KEY_ROOT, KEYS[1], sub }
+  end
+
+  return join { KEY_ROOT, KEYS[1], "agg", sub }
 end
 
 local split_rev = function (rev)
@@ -28,7 +73,8 @@ local next_rev_of = function (rev)
   if not rev then return nil end
 
   local seed, offset = split_rev(rev)
-  return table.concat({ seed, offset + 1 }, '-')
+
+  return join_by "-" { seed, offset + 1 }
 end
 
 local entry_from = function (arr)
@@ -44,25 +90,27 @@ local entry_from = function (arr)
   return entry
 end
 
+-- parse env data
+
+local rev_x = command "get" (keyfor "rev")
+
+-- parse args
+
+local xfrom = ARGV[1] or next_rev_of(rev_x) or '0-0'
+local xto   = ARGV[2] or "+"
+
 --
 
-local rev_x = get(prefixed "agg:rev")
-
 local tear_down = function ()
-  local keys = {
-    prefixed "agg:bids",
-    prefixed "agg:asks",
-    prefixed "agg:rev"
+  return command "DEL" {
+    keyfor "bids",
+    keyfor "asks",
+    keyfor "rev"
   }
-
-  return redis.call("DEL", unpack(keys))
 end
 
 local pull = function ()
-  local from = ARGV[1] or next_rev_of(rev_x) or '0-0'
-  local to   = ARGV[2] or "+"
-
-  local res = redis.call("XRANGE", prefixed "log", from, to)
+  local res = command "XRANGE" (keyfor "log", xfrom, xto)
 
   local revs = {}
   local entries = {}
@@ -75,22 +123,19 @@ local pull = function ()
   return entries, revs
 end
 
-
 local commit = function (side, data)
-  local key = prefixed("agg:" .. side)
-  local arg = {}
+  local key = keyfor(side)
 
-  for k,v in pairs(data) do
-    table.insert(arg, v)
-    table.insert(arg, k)
+  local members = {}
+
+  local push = insert_into(members)
+
+  for k, v in pairs(data) do
+    push(v, k)
   end
 
-  redis.call("ZADD", key, unpack(arg))
-  redis.call("ZREMRANGEBYSCORE", key, "-inf", 0)
-end
-
-local touch = function (rev)
-  return set(prefixed "agg:rev", rev)
+  command "ZADD" (key, members)
+  command "ZREMRANGEBYSCORE" (key, "-inf", 0)
 end
 
 --
@@ -152,6 +197,6 @@ commit("asks", asks)
 
 local rev = revs[#revs]
 
-set(prefixed "agg:rev", rev)
+command "SET" (keyfor "rev", rev)
 
 return rev
