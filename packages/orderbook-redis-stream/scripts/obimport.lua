@@ -2,6 +2,8 @@
 
 local KEY_ROOT = "ob"
 
+local SCALING_FACTOR = 100000000
+
 -- Utils
 
 local join_by = function (split)
@@ -59,6 +61,11 @@ local function keyfor (sub)
 
   return join { KEY_ROOT, KEYS[1], "agg", sub }
 end
+
+local function scaled (x)
+  return tonumber(x) * SCALING_FACTOR
+end
+
 
 local split_rev = function (rev)
   local split = string.find(rev, "-")
@@ -130,8 +137,8 @@ local commit = function (side, data)
 
   local push = insert_into(members)
 
-  for k, v in pairs(data) do
-    push(v, k)
+  for price, amount in pairs(data) do
+    push(amount, scaled(price))
   end
 
   command "ZADD" (key, members)
