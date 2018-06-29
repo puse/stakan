@@ -57,10 +57,10 @@
 1) nil
 ```
 
-### `OBDEPTH key [DEPTH depth] [WITHAMOUNTS]`
+### `OBDEPTH key`
 
 ```
-> OBDEPTH cexio:xmr-usd DEPTH 1 WITHAMOUNTS
+> OBDEPTH cexio:xmr-usd
 
 1) 1) "120"
    2) "88"
