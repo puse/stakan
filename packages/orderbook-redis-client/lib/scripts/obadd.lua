@@ -1,7 +1,13 @@
-local PREFIX = "ob:"
-
 local TOPIC = KEYS[1]
 local SEED  = table.remove(ARGV, 1)
+
+--
+
+local join_by = function (split)
+  return function (tbl)
+    return table.concat(tbl, split)
+  end
+end
 
 --
 
@@ -16,17 +22,18 @@ end
 
 --
 
+local function next_id ()
+  local key = TOPIC .. ":ob:log:offset"
+
+  local offset = redis.call("HINCRBY", key, SEED, 1)
+
+  return join_by "-" { SEED, offset }
+end
+
 local insert = function (data)
-  --
-  local root = PREFIX .. TOPIC
+  local key = TOPIC .. ":ob:log"
 
-  local key_log = root .. ":log"
-  local key_offsets = root .. ":log:offsets"
-
-  local offset = hincr(key_offsets, SEED)
-  local id = SEED .. "-" .. offset
-
-  return xadd(key_log, id, data)
+  return xadd(key, next_id(), data)
 end
 
 --

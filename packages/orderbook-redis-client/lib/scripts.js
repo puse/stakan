@@ -1,6 +1,6 @@
 const { readFileSync } = require('fs')
 
-const { compose } = require('ramda')
+const { compose, toUpper } = require('ramda')
 
 /**
  * Lua scripts directory
@@ -13,13 +13,15 @@ const read = name => {
   return readFileSync(filename, 'utf8')
 }
 
-function obimport (redis) {
-  redis.defineCommand('obimport', {
-    numberOfKeys: 1,
-    lua: read('obimport')
-  })
+const compile = (name, numberOfKeys = 1) => redis => {
+  const lua = read(name)
+
+  redis.defineCommand(toUpper(name), { lua, numberOfKeys })
 
   return redis
 }
 
-module.exports = compose(obimport)
+module.exports = compose(
+  compile('obimport'),
+  compile('obadd')
+)
