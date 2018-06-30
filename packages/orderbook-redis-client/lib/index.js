@@ -53,12 +53,4 @@ class Client extends Redis {
   }
 }
 
-// function Client (opts) {
-//   const client = new Redis(opts)
-//
-//   setupScripts(client)
-//
-//   return client
-// }
-
 module.exports = Client
