@@ -1,13 +1,11 @@
 -- Constants
 
-local KEY_ROOT = "ob"
-
 local SCALING_FACTOR = 100000000
 
 -- Utils
 
 local function keyfor (sub)
-  return table.concat({ KEY_ROOT, KEYS[1], "agg", sub }, ":")
+  return table.concat({ KEYS[1], "ob", sub }, ":")
 end
 
 local function unscaled (x)
@@ -29,4 +27,12 @@ local function pull (side)
   return arr
 end
 
-return { pull "bids", pull "asks" }
+local function get_rev ()
+  return redis.call("GET", keyfor "rev")
+end
+
+return {
+  pull "bids",
+  pull "asks",
+  get_rev()
+}

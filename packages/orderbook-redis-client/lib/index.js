@@ -3,6 +3,10 @@ const { readFileSync } = require('fs')
 const Redis = require('ioredis')
 
 const {
+  compose,
+  map,
+  zipObj,
+  splitEvery,
   flatten,
   props
 } = require('ramda')
@@ -50,6 +54,29 @@ class Client extends Redis {
     }
 
     return this.OBADD(key, seed, ...flatten(args))
+  }
+
+  obdepth (key) {
+    const recover = zipObj(['price', 'amount'])
+
+    const parse = compose(
+      map(recover),
+      splitEvery(2),
+      map(Number)
+    )
+
+    return this
+      .OBDEPTH(key)
+      .then(res => {
+        const [ asks, bids, rev ] = res
+
+        return {
+          rev,
+          asks: parse(asks),
+          bids: parse(bids)
+        }
+      })
+
   }
 }
 
