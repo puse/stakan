@@ -1,7 +1,5 @@
 -- Constants
 
-local KEY_ROOT = "ob"
-
 local SCALING_FACTOR = 100000000
 
 -- Utils
@@ -41,31 +39,42 @@ local flatten = function (tbl)
   return out
 end
 
--- Redis helpers
-
-local function command (cmd)
-  return function (...)
-    local params = flatten(arg)
-    return redis.call(cmd, unpack(params))
-  end
-end
-
 --
 
 local function keyfor (sub)
-  local join = join_by ":"
-
-  if sub == "log" then
-    return join { KEY_ROOT, KEYS[1], sub }
-  end
-
-  return join { KEY_ROOT, KEYS[1], "agg", sub }
+  return join_by ":" { KEYS[1], 'ob', sub }
 end
 
 local function scaled (x)
   return tonumber(x) * SCALING_FACTOR
 end
 
+-- Redis helpers
+
+local function command (cmd)
+  cmd = string.lower(cmd)
+
+  local is_unary = false
+    or cmd == "get"
+    or cmd == "del"
+
+  return function (sub)
+    local key = keyfor(sub)
+
+    if is_unary then
+      redis.debug(cmd, key)
+      return redis.call(cmd, key)
+    end
+
+    return function (...)
+      local params = flatten(arg)
+      redis.debug(cmd, key, params)
+      return redis.call(cmd, key, unpack(params))
+    end
+  end
+end
+
+--
 
 local split_rev = function (rev)
   local split = string.find(rev, "-")
@@ -99,7 +108,7 @@ end
 
 -- parse env data
 
-local rev_x = command "get" (keyfor "rev")
+local rev_x = command "GET" "rev"
 
 -- parse args
 
@@ -109,15 +118,13 @@ local xto   = ARGV[2] or "+"
 --
 
 local tear_down = function ()
-  return command "DEL" {
-    keyfor "bids",
-    keyfor "asks",
-    keyfor "rev"
-  }
+  command "DEL" "bids"
+  command "DEL" "asks"
+  command "DEL" "rev"
 end
 
 local pull = function ()
-  local res = command "XRANGE" (keyfor "log", xfrom, xto)
+  local res = command "XRANGE" "log" (xfrom, xto)
 
   local revs = {}
   local entries = {}
@@ -131,7 +138,8 @@ local pull = function ()
 end
 
 local commit = function (side, data)
-  local key = keyfor(side)
+  -- if empty for a side
+  if next(data) == nil then return nil end
 
   local members = {}
 
@@ -141,15 +149,15 @@ local commit = function (side, data)
     push(amount, scaled(price))
   end
 
-  command "ZADD" (key, members)
-  command "ZREMRANGEBYSCORE" (key, "-inf", 0)
+  command "ZADD" (side) (members)
+  command "ZREMRANGEBYSCORE" (side) ("-inf", 0)
 end
 
 --
 
 local entries, revs = pull()
 
---
+-- Mess
 
 local rev_prev = rev_x
 
@@ -190,6 +198,8 @@ local asks = {}
 for i = nth, #entries do
   local entry = entries[i]
 
+  redis.debug(entry)
+
   if entry.side == "bids" then
     bids[entry.price] = entry.amount
   else
@@ -204,6 +214,6 @@ commit("asks", asks)
 
 local rev = revs[#revs]
 
-command "SET" (keyfor "rev", rev)
+command "SET" "rev" (rev)
 
 return rev

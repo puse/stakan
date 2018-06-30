@@ -6,6 +6,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "ioredis": "^3.2.2"
+    "ioredis": "^3.2.2",
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0"
   }
 }
