@@ -2,10 +2,6 @@ import test from 'ava'
 
 import { Command } from 'ioredis'
 
-import {
-  last,
-} from 'ramda'
-
 import Redis from '..'
 
 /**
@@ -72,7 +68,7 @@ async function addEntries (ctx = {}, entries) {
   return Promise.all(ps)
 }
 
-test.before(async _ => {
+const tearDown = _ => {
   const SUBS = [
     'log',
     'rev',
@@ -84,22 +80,12 @@ test.before(async _ => {
     .map(keyFor)
     .map(sub => redis.del(sub))
 
-  await Promise.all(ps)
-})
+  return Promise.all(ps)
+}
 
-test.after.always(async _ => {
-  const SUBS = [
-    'rev',
-    'asks',
-    'bids'
-  ]
+test.before(tearDown)
 
-  const ps = SUBS
-    .map(keyFor)
-    .map(sub => redis.del(sub))
-
-  await Promise.all(ps)
-})
+test.after.always(tearDown)
 
 test.serial('import', async t => {
   const entries = [
@@ -121,19 +107,19 @@ test.serial('import', async t => {
   const ids = await addEntries({ seed: 1 }, entries)
 
   await redis
-    .obimport(TOPIC, '1-2')
+    .obcommit(TOPIC, '1-2')
     .then(assertRev(null, 'bad start'))
 
   await redis
-    .obimport(TOPIC, 0, ids[2])
+    .obcommit(TOPIC, 0, ids[2])
     .then(assertRev('1-3'))
 
   await redis
-    .obimport(TOPIC, '1-4', '1-5')
+    .obcommit(TOPIC, '1-4', '1-5')
     .then(rev => t.is(rev, '1-5', 'ok start end'))
 
   await redis
-    .obimport(TOPIC)
+    .obcommit(TOPIC)
     .then(rev => t.is(rev, '1-6', 'internal rev as start, till end'))
 
   await redis
@@ -158,7 +144,7 @@ test.serial('next seed', async t => {
   const ids = await addEntries({ seed: 2 }, entries)
 
   await redis
-    .obimport(TOPIC )
+    .obcommit(TOPIC )
 
   await redis
     .zrangebylex(keyFor('bids'), '-', '+')

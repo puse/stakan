@@ -22,6 +22,6 @@ const compile = (name, numberOfKeys = 1) => redis => {
 }
 
 module.exports = compose(
-  compile('obimport'),
-  compile('obadd')
+  compile('obadd'),
+  compile('obcommit')
 )

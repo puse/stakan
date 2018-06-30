@@ -31,14 +31,14 @@
 4) 1526985054069-4
 ```
 
-#### `OBIMPORT key [start] [end]`
+#### `OBCOMMIT key [start] [end]`
 
 ```
-> OBIMPORT cexio:xmr-usd 
+> OBCOMMIT cexio:xmr-usd 
 
 1) "1530060819000-4"
 
-> OBIMPORT cexio:xmr-usd 
+> OBCOMMIT cexio:xmr-usd 
 
 1) nil
 ```

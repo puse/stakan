@@ -30,8 +30,8 @@ class Client extends Redis {
     setupScripts(this)
   }
 
-  obimport (...args) {
-    return this.OBIMPORT(...args)
+  obcommit (...args) {
+    return this.OBCOMMIT(...args)
   }
 
   obadd (key, seed, bids = [], asks = []) {
