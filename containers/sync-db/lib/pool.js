@@ -2,7 +2,7 @@ const debug = require('debug')('stakan:sync:cexio')
 
 const { createPool } = require('generic-pool')
 
-const factory = require('./client')
+const factory = require('./ws')
 
 /**
  * Constants

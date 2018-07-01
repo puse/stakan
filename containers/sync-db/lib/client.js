@@ -1,256 +1,290 @@
 const debug = require('debug')('stakan:sync:cexio')
 
-const getenv = require('getenv')
+const { EventEmitter } = require('events')
 
-const WebSocket = require('ws')
+const assert = require('assert')
 
-const { hmacFrom } = require('./crypto')
+const {
+  isNil,
+  merge,
+  map,
+  zipObj
+} = require('ramda')
 
-/**
- * Constants
- */
-
-/**
- * CEX.IO WebSocket API URL
- */
-
-const SERVER_URL = 'wss://ws.cex.io/ws/'
-
-/**
- * Ready state constants
- */
-
-const STATE_DICT = {
-  'CONNECTING' : 0,
-  'OPEN'       : 1,
-  'CLOSING'    : 2,
-  'CLOSED'     : 3
-}
-
-/**
- * Settings
- */
-
-/**
- * API Credentials
- */
-
-const CREDENTIALS = getenv.multi({
-  apiKey    : ['CEXIO_API_KEY'],
-  apiSecret : ['CEXIO_API_SECRET']
-})
+const createPool = require('./pool')
 
 /**
  * Helpers
  */
 
 /**
- * CEX.IO specific `auth` object
+ * Message contructor
  *
- * @param {Object} creds
- * @param {string} creds.apiKey
- * @param {string} creds.apiSecret
+ * @param {string} e - scope identifier
+ * @param {Object} data - payload of message
+ * @param {string} [oid] - callback identifier
  *
- * @returns {Object}
+ * @returns {string} - Stringified message ready to send
  */
 
-const authFrom = (creds = CREDENTIALS) => {
-  // rename to usable keys
-  const {
-    apiKey    : key,
-    apiSecret : secret
-  } = creds
-
-  const timestamp = Math.floor(Date.now() / 1000)
-
-  const signature = hmacFrom(secret, timestamp + key)
-
-  return {
-    key,
-    signature,
-    timestamp
-  }
-}
-
-/**
- * WS helpers
- */
-
-const close = ws => {
-  debug('Closing WS connection')
-
-  ws.close(1000, 'Expired')
-}
-
-/**
- * Check if open
- *
- * @param {WebSocket} ws
- *
- * @returns {boolean}
- */
-
-const isOpen = ws =>
-  ws.readyState === STATE_DICT['OPEN']
-
-/**
- * Monitor
- */
-
-const monitor = ws => {
-  const out = x => _ => debug(x)
-
-  // translate origin events
-  ws.on('message', msg => {
-    const { e, data, oid } = JSON.parse(msg)
-
-    const { error } = data || {}
-
-    if (e === 'ping') {
-      debug('WS ping received')
-    }
-
-    if (error) {
-      ws.emit('origin:error', error)
-      ws.emit(`origin:${e}:error`, error)
-      ws.emit(`origin:re:${oid}:error`, error)
-    } else {
-      ws.emit(`origin:${e}`, data, oid)
-      ws.emit(`origin:re:${oid}`, data, e)
-    }
-  })
-
-  // debug core events
-  ws.on('open', out('WS open'))
-  ws.on('close', code => debug('WS closed with code %d', code))
-  ws.on('error', err => debug('WS error: %s', ))
-
-  // debug origin events
-  ws.on('origin:connected', out('WS origin connected'))
-  ws.on('origin:disconnecting', out('WS origin disconnecting'))
-
-  ws.on('origin:auth', data => {
-    const { error } = data
-
-    error
-      ? debug('WS origin auth error: %s', error)
-      : debug('WS origin authenticated')
-  })
-}
-
-/**
- * Methods
- */
-
-/**
- * Create a connected client
- *
- * @param {string} [url]
- *
- * @returns {WebSocket}
- */
-
-async function connect (url = SERVER_URL) {
-  let ws
-
-  debug('WS connecting to %s', url)
-
-  try {
-    ws = new WebSocket(url)
-  } catch (err) {
-    debug('WS create error: %s', err.message)
-
-    return Promise.reject(err)
+const messageOf = (e, data, oid) => {
+  const payload = {
+    e,
+    data,
+    oid
   }
 
-  monitor(ws)
-
-  const cb = (resolve, reject) => {
-    try {
-      ws.on('open', _ => resolve(ws))
-    } catch (err) {
-      debug('Error while connecting: %s', err.message)
-
-      reject(err)
-    }
-  }
-
-  return new Promise(cb)
+  return JSON.stringify(payload)
 }
+
+/**
+ * Snapshot parser
+ */
+
+const recoverEntries = map(zipObj(['price', 'amount']))
+
+/**
+ * Actions
+ */
 
 /**
  *
  */
 
-async function authenticate (ws) {
-  const msg = JSON.stringify({
-    e: 'auth',
-    auth: authFrom(CREDENTIALS)
-  })
+async function subscribe (ws, { pair, depth }) {
+  const data = {
+    pair,
+    depth,
+    subscribe: true
+  }
 
-  const cb = (resolve, reject) => {
-    ws.once('origin:auth', ({ error }) => {
-      if (!error) return resolve(ws)
+  const subscribe = (resolve, reject) => {
+    const oid = 'ob:' + Date.now()
 
-      close(ws)
-      reject(new Error(error))
-    })
+    const msg = messageOf('order-book-subscribe', data, oid)
+
+    const topic = `origin:re:${oid}`
+
+    ws.on(topic, resolve)
+    ws.on(`${topic}:error`, reject)
 
     ws.send(msg)
   }
 
-  return new Promise(cb)
+  return new Promise(subscribe)
 }
 
 /**
- * Factory methods
+ *
  */
 
-/**
- * Create
- */
+async function unsubscribe (ws, { pair }) {
 
-async function create () {
-  debug('Pool creating a WS client')
-
-  return connect()
-    .then(authenticate)
-}
-
-/**
- * Destroy
- */
-
-async function destroy (ws) {
-  debug('Pool destroying a WS client')
-  const close = resolve => {
-    ws.once('close', resolve)
-    close('ws')
+  const data = {
+    pair
   }
 
-  return new Promise(close)
+  const unsubscribe = resolve => {
+    const oid = 'ob:' + Date.now()
+
+    const msg = messageOf('order-book-unsubscribe', data, oid)
+
+    ws.on(`origin:re:${oid}`, resolve)
+    ws.send(msg)
+  }
+
+  return new Promise(unsubscribe)
 }
 
 /**
- * Validate
+ *
  */
 
-async function validate (ws) {
-  debug('Pool validation before borrow')
+const pool = createPool()
 
-  const ok = isOpen(ws)
+/**
+ *
+ */
 
-  debug('Pool validation result: %s', ok ? 'ok': 'failed')
+class Remote extends EventEmitter {
+  constructor (symbol, opts = {}) {
+    super()
 
-  return ok
+    const { depth = 20 } = opts
+
+    this.broker = 'cexio'
+    this.symbol = symbol
+
+    this.depth  = depth
+
+    this.reset  = this.reset.bind(this)
+    this.update = this.update.bind(this)
+    this.reject = this.reject.bind(this)
+    this.sync   = this.sync.bind(this)
+    this.stop   = this.stop.bind(this)
+    this.close  = this.close.bind(this)
+
+    this.on('error', this.stop)
+  }
+
+  get nextId () {
+    return ++this.id
+  }
+
+  get pair () {
+    return this.symbol
+      .toUpperCase()
+      .split('-')
+  }
+
+  close () {
+    this.debug('closing')
+    this.emit('close')
+
+    this.removeAllListeners()
+
+    this.ws = null
+  }
+
+  publish (data = {}) {
+    const { seed, broker, symbol } = this
+
+    const { bids, asks } = data
+
+    const payload = {
+      seed,
+      broker,
+      symbol,
+      asks: recoverEntries(asks),
+      bids: recoverEntries(bids)
+    }
+
+    this.emit('patch', payload)
+  }
+
+  debug (msg, ...args) {
+    const { symbol } = this
+    debug(`Remote (%s) ${msg}`, symbol, ...args)
+  }
+
+  monitor () {
+    const { ws } = this
+
+    // keep alive
+    ws.on('origin:ping', _ => {
+      this.debug('keep alive')
+      ws.send(messageOf('pong'))
+    })
+
+    ws.on('origin:disconnecting', this.close)
+
+    try {
+      ws.on('origin:order-book-subscribe', this.reset)
+      ws.on('origin:md_update', this.update)
+    } catch (err) {
+      this.debug('error: %s', err)
+      this.emit('error', err)
+
+      this.stop()
+    }
+  }
+
+  reset (data) {
+    const { id, bids, asks } = data
+
+    this.id = id
+    this.seed = Date.now()
+
+    this.debug('snapshot received')
+    this.publish({ bids, asks })
+  }
+
+  update (data) {
+    const { id, bids, asks } = data
+
+    assert(id === this.nextId, 'Inconsistent sequence')
+
+    this.publish({ bids, asks })
+  }
+
+  async reject (err) {
+    err = err instanceof Error
+      ? err
+      : new Error(err)
+
+    this.debug('error: %s', err.message)
+    this.emit('error', err)
+
+    await this.stop()
+
+    return Promise.reject(err)
+  }
+
+  async sync (opts = {}) {
+    this.depth = opts.depth || this.depth
+
+    const start = ws => {
+      this.ws = ws
+
+      this.debug('connected')
+      this.emit('connected')
+
+      this.subscribe()
+      this.monitor()
+
+      return this
+    }
+
+    return  pool
+      .acquire()
+      .then(start)
+  }
+
+  async subscribe () {
+    const { ws } = this
+
+    const op = _ => {
+      this._subscribed = true
+
+      this.debug('subscribed')
+      this.emit('subscribed')
+    }
+
+    return subscribe(ws, this)
+      .then(op)
+      .catch(this.reject)
+  }
+
+  async unsubscribe () {
+    const { ws } = this
+
+    const op = _ => {
+      this._subscribe = false
+
+      this.debug('unsubscribed')
+      this.emit('unsubscribed')
+    }
+
+    return unsubscribe(ws, this)
+      .then(op)
+      .catch(this.reject)
+  }
+
+  async stop () {
+    await this.unsubscribe()
+
+    await pool.release(ws)
+
+    return this.close()
+  }
+
+  static of (symbol, opts) {
+    return new Remote(symbol, opts)
+  }
 }
 
 /**
- * Expose factory methods
+ * Expose
  */
 
-module.exports = {
-  create,
-  destroy,
-  validate
-}
+module.exports = Remote

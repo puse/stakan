@@ -1,32 +1,50 @@
 const { Observable } = require('rxjs/Rx')
 
-const OrderbookDB = require('@stakan/orderbook-db')
-
 const {
   head,
   last,
   props,
-  juxt
+  juxt,
+  identity
 } = require('ramda')
 
-const Remote = require('./lib')
+const OrderbookDB = require('@stakan/orderbook-db')
 
-const db = new OrderbookDB()
-const remote = new Remote('btc-usd')
+const Connector = require('./lib/client')
 
-const close$ = Observable
-  .fromEvent(remote, 'close')
-
-const orderbook$ = Observable
-  .fromEvent(remote, 'update')
-  .takeUntil(close$)
+/**
+ * Helpers
+ */
 
 const topicOf = ({ broker, symbol }) =>
   `${broker}:${symbol}`
 
+/**
+ * Init
+ */
+
+const db = new OrderbookDB()
+const remote = new Connector('btc-usd')
+
+/**
+ * Signals
+ */
+
+const close$ = Observable
+  .fromEvent(remote, 'close')
+
+const patch$ = Observable
+  .fromEvent(remote, 'patch')
+  .takeUntil(close$)
+
+/**
+ *
+ */
+
 async function applyPatch (patch) {
   const { broker, symbol } = patch
-  const topic = `${broker}:${symbol}`
+
+  const topic = `${broker}/${symbol}`
 
   const add = args => {
     const parsed = props(['seed', 'bids', 'asks'])
@@ -41,8 +59,8 @@ async function applyPatch (patch) {
   return add(patch).then(commit)
 }
 
-orderbook$
+patch$
   .flatMap(applyPatch)
-  .subscribe(console.log)
+  .subscribe(identity, identity, _ => console.log('END'))
 
 remote.sync()
