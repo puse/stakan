@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/orderbook-redis-client",
+  "name": "@stakan/orderbook-db",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
