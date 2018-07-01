@@ -21,10 +21,8 @@ const TOPIC = 'hopar:exo-nyx'
 const keyFor = sub =>
   `${TOPIC}:ob:${sub}`
 
-const Entry = (price, amount = 1) => [
-  amount,
-  price
-]
+const Entry = (price, amount = 1) =>
+  [ amount, price ]
 
 /**
  *
@@ -72,40 +70,12 @@ test.serial('obdepth', async t => {
   await redis
     .obdepth(TOPIC)
     .then(res => {
-      console.log(res)
-    })
+      const expeced = {
+        rev: '1-4',
+        asks: [ { price: 24, amount: 1  }, { price: 24.5, amount: 1  } ],
+        bids: [ { price: 25, amount: 1  }, { price: 26, amount: 1  } ]
+      }
 
-  t.pass()
-  // const assertRev = (expected, message) => rev =>
-  //   t.is(rev, expected, message)
-  //
-  // const assertList = (expected, message) => list =>
-  //   t.deepEqual(list, expected, message)
-  //
-  //
-  // const ids = await addEntries({ seed: 1 }, entries)
-  //
-  // await redis
-  //   .obcommit(TOPIC, '1-2')
-  //   .then(assertRev(null, 'bad start'))
-  //
-  // await redis
-  //   .obcommit(TOPIC, 0, ids[2])
-  //   .then(assertRev('1-3'))
-  //
-  // await redis
-  //   .obcommit(TOPIC, '1-4', '1-5')
-  //   .then(rev => t.is(rev, '1-5', 'ok start end'))
-  //
-  // await redis
-  //   .obcommit(TOPIC)
-  //   .then(rev => t.is(rev, '1-6', 'internal rev as start, till end'))
-  //
-  // await redis
-  //   .zrangebylex(keyFor('bids'), '-', '+')
-  //   .then(assertList([ '2450000000' ]))
-  //
-  // await redis
-  //   .zrangebylex(keyFor('asks'), '-', '+')
-  //   .then(assertList([ '2500000000', '2550000000' ]))
+      t.deepEqual(res, expeced)
+    })
 })
