@@ -20,51 +20,46 @@
 
 ## API
 
-#### `OBADD key seed BIDS price amount ASKS price amount`
+### Instance methods
 
-```
-> OBADD cexio:xmr-usd 1530060819000 BIDS 119.5 22.1 120 88 ASKS 121 8.2 122 50
+#### `obadd`
 
-1) 1526985054069-1
-2) 1526985054069-2
-3) 1526985054069-3
-4) 1526985054069-4
-```
+**Arguments**
 
-#### `OBCOMMIT key [start] [end]`
+- `topic` - String. Identifier in format of `BROKER:SYMBOL`
+- `seed` - Number
+- `bids` - Array of entries
+- `asks` - Array of entries
 
-```
-> OBCOMMIT cexio:xmr-usd 
+**Reply**
 
-1) "1530060819000-4"
+Array of inserted entries ids
 
-> OBCOMMIT cexio:xmr-usd 
+```js
+const seed = Date.now()
 
-1) nil
-```
+const bids = [ { price: 24.8, amount: 1.8 } ]
+const asks = [ { price: 25.2, amount: 2 } ]
 
-#### `OBDEPTH key`
+client
+  .obadd('hopar:exo-nyx', seed, bids, asks)
+  .then(console.log)
 
-```
-> OBDEPTH cexio:xmr-usd
-
-1) 1) "120"
-   2) "88"
-   3) "119.5"
-   4) "22.1"
-2) 1) "121"
-   2) "8.2"
-   3) "122"
-   4) "50"
+// ['1530060819000-1', '1530060819000-2']
 ```
 
-#### `OBTOP key`
+#### `obcommit`
 
-```
-> OBTOP cexio:xmr-usd
+- `topic`
+- `start` - By default last cached ref or `0-0`
+- `end` - Last id to fetch
 
-1) 1) "120"
-   2) "88"
-2) 1) "121"
-   2) "8.2"
-```
+#### `obdepth`
+
+#### `obwatch`
+
+**Arguments**
+
+- `topic`
+- `rev` - Last fetched id, `$` by default (ongoing)
+- `t` - Milliseconds to block, `1000` by default
