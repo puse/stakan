@@ -22,13 +22,20 @@ const parseEntries = map(props(['price', 'amount']))
 const parseArgs = compose(
   flatten,
   toPairs,
-  tap(console.log),
   map(parseEntries), // { bids: [[], ...], ... }
   groupBy(prop('side')) // { bids: [{}, ...], ... }
 )
 
-function obadd (db, data, rows) {
-  const { session } = data
+function obadd (db, data, ...rest) {
+  let session, rows
+
+  if (rest.length === 0) {
+    session = data.session
+    rows = data.rows
+  } else {
+    session = rest[0]
+    rows = rest[1]
+  }
 
   const uri = targetToString(data)
 
