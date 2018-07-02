@@ -167,7 +167,7 @@ class Remote extends EventEmitter {
     debug(`Remote (%s) ${msg}`, symbol, ...args)
   }
 
-  monitor () {
+  watch () {
     const { ws } = this
 
     // keep alive
@@ -230,7 +230,7 @@ class Remote extends EventEmitter {
       this.emit('connected')
 
       this.subscribe()
-      this.monitor()
+      this.watch()
 
       return this
     }

@@ -10,7 +10,7 @@ const {
 
 const OrderbookDB = require('@stakan/orderbook-db')
 
-const Connector = require('./lib/client')
+const Remote = require('./lib/remote')
 
 /**
  * Helpers
@@ -24,24 +24,12 @@ const topicOf = ({ broker, symbol }) =>
  */
 
 const db = new OrderbookDB()
-const remote = new Connector('btc-usd')
-
-/**
- * Signals
- */
-
-const close$ = Observable
-  .fromEvent(remote, 'close')
-
-const patch$ = Observable
-  .fromEvent(remote, 'patch')
-  .takeUntil(close$)
 
 /**
  *
  */
 
-async function applyPatch (patch) {
+async function sync (patch) {
   const { broker, symbol } = patch
 
   const topic = `${broker}/${symbol}`
@@ -59,8 +47,5 @@ async function applyPatch (patch) {
   return add(patch).then(commit)
 }
 
-patch$
-  .flatMap(applyPatch)
-  .subscribe(identity, identity, _ => console.log('END'))
-
-remote.sync()
+Remote('btc-usd')
+  .subscribe(sync, identity, _ => console.log('END'))
