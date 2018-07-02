@@ -35,7 +35,7 @@ async function sync (patch) {
   const topic = `${broker}/${symbol}`
 
   const add = args => {
-    const parsed = props(['seed', 'bids', 'asks'])
+    const parsed = props(['session', 'bids', 'asks'])
     return db.obadd(topic, ...parsed(args))
   }
 
@@ -49,5 +49,5 @@ async function sync (patch) {
 
 Source('btc-usd')
   .retryWhen(identity)
-  .map(sync)
+  .flatMap(sync)
   .subscribe(console.log, identity, _ => console.log('END'))
