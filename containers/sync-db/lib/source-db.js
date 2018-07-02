@@ -25,7 +25,7 @@ function Source (target) {
 
     const read = () => {
       const use = rows => {
-        if (!rows) return void 0
+        if (!Array.isArray(rows)) return void 0
 
         rows.forEach(push)
       }
@@ -34,6 +34,7 @@ function Source (target) {
         .obwatch(topic, rev)
         .then(use)
         .then(read)
+        .catch(read)
     }
 
     read()
