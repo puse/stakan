@@ -12,7 +12,7 @@ function targetFrom (params) {
   return params
 }
 
-function targetToUri (params) {
+function targetToString (params) {
   if (typeof params === 'string') return params
 
   const { broker, symbol } = params
@@ -26,5 +26,5 @@ function keyFor (root, sub) {
 }
 
 module.exports.targetFrom = targetFrom
-module.exports.targetToUri = targetToUri
+module.exports.targetToString = targetToString
 module.exports.keyFor = curryN(2, keyFor)

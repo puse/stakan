@@ -12,7 +12,7 @@ const {
 const {
   keyFor,
   targetFrom,
-  targetToUri
+  targetToString
 } = require('./helpers')
 
 /**
@@ -58,7 +58,7 @@ const recover = res => {
 
 function obdepth (db, params) {
   const target = targetFrom(params)
-  const uri = targetToUri(target)
+  const uri = targetToString(target)
 
   return db
     .OBDEPTH(uri)

@@ -12,6 +12,8 @@ import {
 
 import Redis from '..'
 
+import { obadd } from '../lib/commands'
+
 /**
  *
  */
@@ -21,7 +23,7 @@ const CONFIG = {
   // db: 1
 }
 
-const TOPIC = 'hopar:exo-nyx'
+const TOPIC = 'hopar/exo-nyx'
 
 /**
  * Helpers
@@ -30,8 +32,14 @@ const TOPIC = 'hopar:exo-nyx'
 const keyFor = sub =>
   `${TOPIC}:ob:${sub}`
 
-const Entry = (price, amount = 1) =>
-  ({ price, amount })
+const rowOf = (side, price, amount = 1) =>
+  ({ side, price, amount })
+
+const BidRow = (...args) =>
+  rowOf('bids', ...args)
+
+const AskRow = (...args) =>
+  rowOf('asks', ...args)
 
 /**
  *
@@ -84,23 +92,29 @@ test.before(tearDown)
 test.after.always(tearDown)
 
 test.serial('add', async t => {
-  await redis
-    .obadd(TOPIC, 1, [ Entry(24.5) ], [ Entry(25) ])
+  const add = (...args) => obadd(redis, ...args)
+
+  const ob1 = {
+    broker: 'hopar',
+    symbol: 'exo-nyx',
+    session: 1
+  }
+
+  await add(ob1, [ BidRow(24.5), AskRow(25) ])
     .then(revs => {
       t.deepEqual(revs, [ '1-1', '1-2' ])
     })
 
-  await redis
-    .obadd(TOPIC, 1, [], [ Entry(26) ])
+  await add(ob1, [ AskRow(26) ])
     .then(revs => {
       t.deepEqual(revs, ['1-3'], 'good revs')
     })
 
-  await redis
-    .obadd(TOPIC, 2, [ Entry(24) ])
-    .then(revs => {
-      t.deepEqual(revs, ['2-1'], 'reset offset')
-    })
+  // await redis
+  //   .obadd(TOPIC, 2, [ Entry(24) ])
+  //   .then(revs => {
+  //     t.deepEqual(revs, ['2-1'], 'reset offset')
+  //   })
 
   await fetchEntries()
     .then(entries => {
@@ -108,7 +122,7 @@ test.serial('add', async t => {
         { side: 'bids', price: '24.5', amount: '1', id: '1-1' },
         { side: 'asks', price: '25', amount: '1', id: '1-2' },
         { side: 'asks', price: '26', amount: '1', id: '1-3' },
-        { side: 'bids', price: '24', amount: '1', id: '2-1' }
+        // { side: 'bids', price: '24', amount: '1', id: '2-1' }
       ]
 
       t.deepEqual(entries, expected)
