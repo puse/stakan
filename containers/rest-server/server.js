@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:rest')
+const debug = require('debug')('stakan:http')
 
 const Koa = require('koa')
 
