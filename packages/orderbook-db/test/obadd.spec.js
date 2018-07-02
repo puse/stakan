@@ -3,6 +3,7 @@ import test from 'ava'
 import { Command } from 'ioredis'
 
 import {
+  times,
   compose,
   splitEvery,
   assoc,
@@ -51,6 +52,19 @@ const redis = new Redis(CONFIG)
  * Commands
  */
 
+async function card () {
+  const key = keyFor('log')
+
+  const options = {
+    replyEncoding: 'utf8'
+  }
+
+  const cmd = new Command('xlen', [ key ], options)
+
+  return redis
+    .sendCommand(cmd)
+}
+
 async function fetchEntries (start = '-', end = '+') {
   const key = keyFor('log')
 
@@ -89,7 +103,7 @@ const tearDown = _ => {
 }
 
 test.before(tearDown)
-test.after.always(tearDown)
+test.afterEach.always(tearDown)
 
 test.serial('add', async t => {
   const add = (...args) => obadd(redis, ...args)
@@ -97,24 +111,27 @@ test.serial('add', async t => {
   const ob1 = {
     broker: 'hopar',
     symbol: 'exo-nyx',
-    session: 1
+    session: 1,
+    rows: [
+      BidRow(24.5),
+      AskRow(25)
+    ]
   }
 
-  await add(ob1, [ BidRow(24.5), AskRow(25) ])
+  await add(ob1)
     .then(revs => {
       t.deepEqual(revs, [ '1-1', '1-2' ])
     })
 
-  await add(ob1, [ AskRow(26) ])
+  await add(TOPIC, 1, [ AskRow(26) ])
     .then(revs => {
       t.deepEqual(revs, ['1-3'], 'good revs')
     })
 
-  // await redis
-  //   .obadd(TOPIC, 2, [ Entry(24) ])
-  //   .then(revs => {
-  //     t.deepEqual(revs, ['2-1'], 'reset offset')
-  //   })
+  await add(TOPIC, 2, [ BidRow(24) ])
+    .then(revs => {
+      t.deepEqual(revs, ['2-1'], 'reset offset')
+    })
 
   await fetchEntries()
     .then(entries => {
@@ -122,9 +139,23 @@ test.serial('add', async t => {
         { side: 'bids', price: '24.5', amount: '1', id: '1-1' },
         { side: 'asks', price: '25', amount: '1', id: '1-2' },
         { side: 'asks', price: '26', amount: '1', id: '1-3' },
-        // { side: 'bids', price: '24', amount: '1', id: '2-1' }
+        { side: 'bids', price: '24', amount: '1', id: '2-1' }
       ]
 
       t.deepEqual(entries, expected)
     })
+})
+
+test.serial('capped', async t => {
+  let offset = 10000
+  const step = 20
+
+  while (offset = offset - step) {
+    const rows = times(BidRow, step)
+    await obadd(redis, TOPIC, 1, rows)
+  }
+
+  const size = await card()
+
+  t.true(size < 1200, 'near 1000')
 })
