@@ -1,3 +1,5 @@
+const debug = require('debug')('stakan:ob:sink')
+
 const { Observable } = require('rxjs/Rx')
 
 const {
@@ -16,8 +18,6 @@ const Source = require('@stakan/orderbook-source-cexio')
  * Helpers
  */
 
-const topicOf = ({ broker, symbol }) =>
-  `${broker}:${symbol}`
 
 /**
  * Init
@@ -48,4 +48,6 @@ async function sync (patch) {
 }
 
 Source('btc-usd')
-  .subscribe(sync, identity, _ => console.log('END'))
+  .retryWhen(identity)
+  .map(sync)
+  .subscribe(console.log, identity, _ => console.log('END'))
