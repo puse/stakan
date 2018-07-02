@@ -10,7 +10,7 @@ const {
 
 const OrderbookDB = require('@stakan/orderbook-db')
 
-const Remote = require('./lib/remote')
+const Source = require('@stakan/orderbook-source-cexio')
 
 /**
  * Helpers
@@ -47,5 +47,5 @@ async function sync (patch) {
   return add(patch).then(commit)
 }
 
-Remote('btc-usd')
+Source('btc-usd')
   .subscribe(sync, identity, _ => console.log('END'))
