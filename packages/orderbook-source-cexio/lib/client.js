@@ -6,7 +6,9 @@ const assert = require('assert')
 
 const {
   isNil,
-  merge
+  merge,
+  map,
+  zipObj
 } = require('ramda')
 
 const createPool = require('./pool')
@@ -36,6 +38,12 @@ const messageOf = (e, data, oid) => {
 }
 
 /**
+ * Snapshot parser
+ */
+
+const recoverEntries = map(zipObj(['price', 'amount']))
+
+/**
  * Actions
  */
 
@@ -44,17 +52,17 @@ const messageOf = (e, data, oid) => {
  */
 
 async function subscribe (ws, { pair, depth }) {
-  const oid = 'OB_OID:' + Date.now()
-
   const data = {
     pair,
     depth,
     subscribe: true
   }
 
-  const msg = messageOf('order-book-subscribe', data, oid)
-
   const subscribe = (resolve, reject) => {
+    const oid = 'ob:' + Date.now()
+
+    const msg = messageOf('order-book-subscribe', data, oid)
+
     const topic = `origin:re:${oid}`
 
     ws.on(topic, resolve)
@@ -71,15 +79,16 @@ async function subscribe (ws, { pair, depth }) {
  */
 
 async function unsubscribe (ws, { pair }) {
-  const oid = 'OB_OID:' + Date.now()
 
   const data = {
     pair
   }
 
-  const msg = messageOf('order-book-unsubscribe', data, oid)
-
   const unsubscribe = resolve => {
+    const oid = 'ob:' + Date.now()
+
+    const msg = messageOf('order-book-unsubscribe', data, oid)
+
     ws.on(`origin:re:${oid}`, resolve)
     ws.send(msg)
   }
@@ -137,16 +146,20 @@ class Remote extends EventEmitter {
     this.ws = null
   }
 
-  publish (ev, data = {}) {
-    const { broker, symbol } = this
+  publish (data = {}) {
+    const { seed, broker, symbol } = this
 
-    const complete = merge({
-      ev,
+    const { bids, asks } = data
+
+    const payload = {
+      seed,
       broker,
-      symbol
-    })
+      symbol,
+      asks: recoverEntries(asks),
+      bids: recoverEntries(bids)
+    }
 
-    this.emit(ev, complete(data))
+    this.emit('patch', payload)
   }
 
   debug (msg, ...args) {
@@ -154,7 +167,7 @@ class Remote extends EventEmitter {
     debug(`Remote (%s) ${msg}`, symbol, ...args)
   }
 
-  monitor () {
+  watch () {
     const { ws } = this
 
     // keep alive
@@ -180,9 +193,10 @@ class Remote extends EventEmitter {
     const { id, bids, asks } = data
 
     this.id = id
+    this.seed = Date.now()
 
     this.debug('snapshot received')
-    this.publish('reset', { bids, asks })
+    this.publish({ bids, asks })
   }
 
   update (data) {
@@ -190,7 +204,7 @@ class Remote extends EventEmitter {
 
     assert(id === this.nextId, 'Inconsistent sequence')
 
-    this.publish('update', { bids, asks })
+    this.publish({ bids, asks })
   }
 
   async reject (err) {
@@ -216,7 +230,7 @@ class Remote extends EventEmitter {
       this.emit('connected')
 
       this.subscribe()
-      this.monitor()
+      this.watch()
 
       return this
     }

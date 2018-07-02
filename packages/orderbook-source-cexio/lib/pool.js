@@ -4,6 +4,8 @@ const getenv = require('getenv')
 
 const WebSocket = require('ws')
 
+const { createPool } = require('generic-pool')
+
 const { hmacFrom } = require('./crypto')
 
 /**
@@ -17,6 +19,15 @@ const { hmacFrom } = require('./crypto')
 const SERVER_URL = 'wss://ws.cex.io/ws/'
 
 /**
+ * API Credentials
+ */
+
+const CREDENTIALS = getenv.multi({
+  apiKey    : ['CEXIO_API_KEY'],
+  apiSecret : ['CEXIO_API_SECRET']
+})
+
+/**
  * Ready state constants
  */
 
@@ -28,17 +39,13 @@ const STATE_DICT = {
 }
 
 /**
- * Settings
+ * Pool config
  */
 
-/**
- * API Credentials
- */
-
-const CREDENTIALS = getenv.multi({
-  apiKey    : ['CEXIO_API_KEY'],
-  apiSecret : ['CEXIO_API_SECRET']
-})
+const CONFIG = {
+  max: 2,
+  testOnBorrow: true
+}
 
 /**
  * Helpers
@@ -94,12 +101,10 @@ const isOpen = ws =>
   ws.readyState === STATE_DICT['OPEN']
 
 /**
- * Monitor
+ * Watch
  */
 
-const monitor = ws => {
-  const out = x => _ => debug(x)
-
+const watch = ws => {
   // translate origin events
   ws.on('message', msg => {
     const { e, data, oid } = JSON.parse(msg)
@@ -120,6 +125,16 @@ const monitor = ws => {
     }
   })
 
+  return ws
+}
+
+/**
+ * Monitor
+ */
+
+const monitor = ws => {
+  const out = x => _ => debug(x)
+
   // debug core events
   ws.on('open', out('WS open'))
   ws.on('close', code => debug('WS closed with code %d', code))
@@ -136,6 +151,8 @@ const monitor = ws => {
       ? debug('WS origin auth error: %s', error)
       : debug('WS origin authenticated')
   })
+
+  return ws
 }
 
 /**
@@ -163,6 +180,7 @@ async function connect (url = SERVER_URL) {
     return Promise.reject(err)
   }
 
+  watch(ws)
   monitor(ws)
 
   const cb = (resolve, reject) => {
@@ -223,12 +241,13 @@ async function create () {
 
 async function destroy (ws) {
   debug('Pool destroying a WS client')
-  const close = resolve => {
+
+  const closed = resolve => {
     ws.once('close', resolve)
     close('ws')
   }
 
-  return new Promise(close)
+  return new Promise(closed)
 }
 
 /**
@@ -245,12 +264,26 @@ async function validate (ws) {
   return ok
 }
 
+
 /**
- * Expose factory methods
+ * Pool constructor
+ *
+ * @param {Object} [opts] - Options for `generic-pool`
+ *
+ * @returns {Pool}
  */
 
-module.exports = {
-  create,
-  destroy,
-  validate
+function Pool (opts = CONFIG) {
+  const factory = {
+    create,
+    destroy,
+    validate
+  }
+  return createPool(factory, opts)
 }
+
+/**
+ * Expose constructor
+ */
+
+module.exports = Pool
