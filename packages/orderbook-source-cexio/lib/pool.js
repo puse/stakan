@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:sync:cexio')
+const debug = require('debug')('stakan:source:cexio')
 
 const getenv = require('getenv')
 
@@ -105,24 +105,30 @@ const isOpen = ws =>
  */
 
 const watch = ws => {
+
   // translate origin events
   ws.on('message', msg => {
     const { e, data, oid } = JSON.parse(msg)
 
     const { error } = data || {}
 
-    if (e === 'ping') {
-      debug('WS ping received')
-    }
-
     if (error) {
       ws.emit('origin:error', error)
       ws.emit(`origin:${e}:error`, error)
-      ws.emit(`origin:re:${oid}:error`, error)
+      ws.emit(`origin:error:${oid}`, error)
     } else {
+      ws.emit(`origin`, e, data, oid)
       ws.emit(`origin:${e}`, data, oid)
       ws.emit(`origin:re:${oid}`, data, e)
     }
+  })
+
+  // keep alive
+  ws.on('origin:ping', _ => {
+    debug('Ping received')
+
+    const pongMsg = JSON.stringify({ e: 'pong' })
+    ws.send(pongMsg)
   })
 
   return ws
