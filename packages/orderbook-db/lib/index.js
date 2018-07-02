@@ -59,30 +59,6 @@ class Client extends Redis {
     return this.OBADD(key, seed, ...flatten(args))
   }
 
-  obdepth (key) {
-    const toEntry = zipObj(['price', 'amount'])
-
-    const parse = compose(
-      map(toEntry),
-      splitEvery(2),
-      map(Number)
-    )
-
-    const recover = res => {
-      const [ asks, bids, rev ] = res
-
-      return {
-        rev,
-        asks: parse(asks),
-        bids: parse(bids)
-      }
-    }
-
-    return this
-      .OBDEPTH(key)
-      .then(recover)
-  }
-
   obwatch (topic, id = '$', t = 1e3) {
     const key = `${topic}:ob:log`
     const args = ['BLOCK', t, 'streams', key, id]

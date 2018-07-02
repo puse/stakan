@@ -32,7 +32,7 @@ local function get_rev ()
 end
 
 return {
+  get_rev(),
   pull "bids",
   pull "asks",
-  get_rev()
 }

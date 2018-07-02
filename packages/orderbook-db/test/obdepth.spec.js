@@ -1,7 +1,8 @@
-
 import test from 'ava'
 
 import Redis from '..'
+
+import { obdepth } from '../lib/commands'
 
 /**
  *
@@ -12,7 +13,7 @@ const CONFIG = {
   // db: 1
 }
 
-const TOPIC = 'hopar:exo-nyx'
+const TOPIC = 'hopar/exo-nyx'
 
 /**
  * Helpers
@@ -67,13 +68,31 @@ test.serial('obdepth', async t => {
   await redis.zadd(keyFor('bids'), ...bids)
   await redis.zadd(keyFor('asks'), ...asks)
 
-  await redis
-    .obdepth(TOPIC)
+  await obdepth(redis, TOPIC)
     .then(res => {
       const expeced = {
+        broker: 'hopar',
+        symbol: 'exo-nyx',
         rev: '1-4',
-        asks: [ { price: 24, amount: 1  }, { price: 24.5, amount: 1  } ],
-        bids: [ { price: 25, amount: 1  }, { price: 26, amount: 1  } ]
+        rows: [
+          {
+            side: 'bids',
+            price: 24,
+            amount: 1
+          }, {
+            side: 'bids',
+            price: 24.5,
+            amount: 1
+          }, {
+            side: 'asks',
+            price: 25,
+            amount: 1
+          }, {
+            side: 'asks',
+            price: 26,
+            amount: 1
+          }
+        ]
       }
 
       t.deepEqual(res, expeced)
