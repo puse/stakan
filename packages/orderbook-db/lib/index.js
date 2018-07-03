@@ -19,8 +19,6 @@ const setupScripts = require('./scripts')
  *
  */
 
-const { Command } = Redis
-
 /**
  * Utils
  */
@@ -36,11 +34,6 @@ class Client extends Redis {
 
     setupScripts(this)
   }
-
-  obcommit (...args) {
-    return this.OBCOMMIT(...args)
-  }
-
 }
 
 module.exports = Client
