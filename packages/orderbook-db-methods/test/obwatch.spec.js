@@ -2,7 +2,6 @@ import test from 'ava'
 
 import { Command } from 'ioredis'
 
-
 import Redis from '@stakan/redis'
 
 import { obwatch } from '..'
