@@ -12,7 +12,8 @@
     "nodemon": "^1.17.5"
   },
   "dependencies": {
-    "@stakan/orderbook-db": "*",
+    "@stakan/redis": "*",
+    "@stakan/orderbook-db-methods": "*",
     "@stakan/orderbook-router": "*",
     "@stakan/orderbook-source-cexio": "*",
     "@stakan/publisher": "*",

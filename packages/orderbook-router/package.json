@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@stakan/orderbook-db": "*",
+    "@stakan/redis": "*",
+    "@stakan/orderbook-db-methods": "*",
     "koa-router": "^7.4.0"
   }
 }

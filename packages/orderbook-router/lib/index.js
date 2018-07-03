@@ -1,16 +1,18 @@
 const Router = require('koa-router')
 
-const OrderbookDB = require('@stakan/orderbook-db')
+const Redis = require('@stakan/redis')
+
+const { obdepth } = require('@stakan/orderbook-db-methods')
 
 function read ({ store }) {
-
   return async ctx => {
     const { params } = ctx
 
-    const { broker, symbol } = ctx.params
-    const topic = `${broker}/${symbol}`
-
-    ctx.body = await store.obdepth(topic)
+    ctx.body = await obdepth(store, ctx.params)
+    // const { broker, symbol } = ctx.params
+    // const topic = `${broker}/${symbol}`
+    //
+    // ctx.body = await store.obdepth(topic)
   }
 }
 
@@ -19,7 +21,7 @@ function createRouter () {
     prefix: '/orderbooks'
   })
 
-  const store = new OrderbookDB()
+  const store = new Redis()
 
   router.get('/:broker/:symbol', read({ store }))
 
