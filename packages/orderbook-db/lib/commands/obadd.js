@@ -42,7 +42,7 @@ function obadd (db, data, ...rest) {
   const args = parseArgs(rows || data.rows)
 
   return db
-    .OBADD(uri, session, ...args)
+    .obadd(uri, session, ...args)
 }
 
 module.exports = obadd

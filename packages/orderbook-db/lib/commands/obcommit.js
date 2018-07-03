@@ -7,7 +7,7 @@ const {
 function obcommit (redis, target, ...range) {
   const key = targetToString(target)
 
-  return redis.OBCOMMIT(key, ...range)
+  return redis.obcommit(key, ...range)
 }
 
 module.exports = obcommit

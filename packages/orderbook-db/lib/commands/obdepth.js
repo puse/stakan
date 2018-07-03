@@ -61,7 +61,7 @@ function obdepth (db, params) {
   const uri = targetToString(target)
 
   return db
-    .OBDEPTH(uri)
+    .obdepth(uri)
     .then(recover)
     .then(merge(target))
 }

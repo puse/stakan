@@ -116,6 +116,4 @@ test.serial('import', async t => {
   await addRows({ seed: 2 }, [ BidRow(24) ])
 
   await p3.then(res => t.not(res, null))
-
-  await p3.then(console.log)
 })

@@ -1,6 +1,6 @@
 const { readFileSync } = require('fs')
 
-const { compose, toUpper } = require('ramda')
+const { compose } = require('ramda')
 
 /**
  * Lua scripts directory
@@ -16,7 +16,7 @@ const read = name => {
 const compile = (name, numberOfKeys = 1) => redis => {
   const lua = read(name)
 
-  redis.defineCommand(toUpper(name), { lua, numberOfKeys })
+  redis.defineCommand(name, { lua, numberOfKeys })
 
   return redis
 }
