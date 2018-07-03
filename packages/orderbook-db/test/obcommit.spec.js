@@ -2,9 +2,9 @@ import test from 'ava'
 
 import { Command } from 'ioredis'
 
-import Redis from '..'
+import Redis from '@stakan/redis'
 
-import { obcommit } from '../lib/commands'
+import { obcommit } from '..'
 
 /**
  *

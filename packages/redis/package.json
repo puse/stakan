@@ -1,0 +1,16 @@
+{
+  "name": "@stakan/redis",
+  "version": "0.0.1",
+  "description": "Redis client enhanced with domain commands",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ioredis": "^3.2.2",
+    "ramda": "^0.25.0"
+  }
+}

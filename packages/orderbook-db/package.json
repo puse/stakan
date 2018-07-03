@@ -10,6 +10,7 @@
     "ramda": "^0.25.0"
   },
   "devDependencies": {
+    "@stakan/redis": "*",
     "ava": "^0.25.0"
   }
 }

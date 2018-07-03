@@ -1,4 +1,6 @@
-# Orderbook scripts
+# Redis
+
+## API
 
 #### `OBADD key seed BIDS price amount ASKS price amount`
 

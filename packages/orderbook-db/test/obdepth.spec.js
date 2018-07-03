@@ -1,8 +1,8 @@
 import test from 'ava'
 
-import Redis from '..'
+import Redis from '@stakan/redis'
 
-import { obdepth } from '../lib/commands'
+import { obdepth } from '..'
 
 /**
  *

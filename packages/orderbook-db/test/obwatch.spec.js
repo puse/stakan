@@ -2,9 +2,10 @@ import test from 'ava'
 
 import { Command } from 'ioredis'
 
-import Redis from '..'
 
-import { obwatch } from '../lib/commands'
+import Redis from '@stakan/redis'
+
+import { obwatch } from '..'
 
 /**
  *

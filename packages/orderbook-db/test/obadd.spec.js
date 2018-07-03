@@ -11,9 +11,9 @@ import {
   fromPairs
 } from 'ramda'
 
-import Redis from '..'
+import Redis from '@stakan/redis'
 
-import { obadd } from '../lib/commands'
+import { obadd } from '..'
 
 /**
  *
