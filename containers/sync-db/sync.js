@@ -10,7 +10,12 @@ const {
   identity
 } = require('ramda')
 
-const OrderbookDB = require('@stakan/orderbook-db')
+const Redis = require('@stakan/redis')
+
+const {
+  obadd,
+  obcommit
+} = require('@stakan/orderbook-db-methods')
 
 const Source = require('@stakan/orderbook-source-cexio')
 
@@ -23,7 +28,7 @@ const Source = require('@stakan/orderbook-source-cexio')
  * Init
  */
 
-const db = new OrderbookDB()
+const db = new Redis()
 
 /**
  *
@@ -36,12 +41,12 @@ async function sync (patch) {
 
   const add = args => {
     const parsed = props(['session', 'bids', 'asks'])
-    return db.obadd(topic, ...parsed(args))
+    return obadd(db, patch)
   }
 
   const commit = args => {
     const parsed = juxt([ head, last ])
-    return db.obcommit(topic, ...parsed(args))
+    return obcommit(db, topic, ...parsed(args))
   }
 
   return add(patch).then(commit)
