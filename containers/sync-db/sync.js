@@ -5,7 +5,6 @@ const { Observable } = require('rxjs/Rx')
 const {
   head,
   last,
-  props,
   juxt,
   identity
 } = require('ramda')
@@ -35,21 +34,12 @@ const db = new Redis()
  */
 
 async function sync (patch) {
-  const { broker, symbol } = patch
-
-  const topic = `${broker}/${symbol}`
-
-  const add = args => {
-    const parsed = props(['session', 'bids', 'asks'])
-    return obadd(db, patch)
-  }
-
-  const commit = args => {
+  const commit = range => {
     const parsed = juxt([ head, last ])
-    return obcommit(db, topic, ...parsed(args))
+    return obcommit(db, patch, ...parsed(range))
   }
 
-  return add(patch).then(commit)
+  return obadd(db, patch).then(commit)
 }
 
 Source('btc-usd')
