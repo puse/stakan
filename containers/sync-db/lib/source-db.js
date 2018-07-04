@@ -5,9 +5,11 @@ const {
   identity
 } = require('ramda')
 
-const OrderbookDB = require('@stakan/orderbook-db')
+const Redis = require('@stakan/redis')
 
-const db = new OrderbookDB()
+const { obwatch } = require('@stakan/orderbook-db-methods')
+
+const db = new Redis()
 
 function Source (target) {
   const { broker, symbol } = target
@@ -30,8 +32,7 @@ function Source (target) {
         rows.forEach(push)
       }
 
-      return db
-        .obwatch(topic, rev)
+      return obwatch(db, topic, rev)
         .then(use)
         .then(read)
         .catch(read)
