@@ -10,11 +10,22 @@ const {
   toPairs,
   zipObj,
   propEq,
-  concat
+  concat,
+  head,
+  last,
+  identity
 } = require('ramda')
 
 const pollMqtt = require('./mqtt')
 const pollHttp = require('./http')
+
+const nextRevOf = rev => {
+  const [ seed, offset ] = rev
+    .split('-')
+    .map(Number)
+
+  return `${seed}-${offset+1}`
+}
 
 const flattenSides = obj => {
   const one = arr => {
@@ -25,24 +36,22 @@ const flattenSides = obj => {
 
   const op = compose(
     sides => concat(...sides),
-    map(one),
-    toPairs
-  )
+    map(one), toPairs)
 
   return op(obj)
 }
 
+const rowFromPair = compose(
+  zipObj(['price', 'amount']),
+  map(Number)
+)
+
+const fromDict = compose(
+  map(rowFromPair),
+  toPairs
+)
+
 const rowsFromSides = sides => {
-  const fromPair = compose(
-    zipObj(['price', 'amount']),
-    map(Number)
-  )
-
-  const fromDict = compose(
-    map(fromPair),
-    toPairs
-  )
-
   const bids = fromDict(sides.bids)
   const asks = fromDict(sides.asks)
 
@@ -73,8 +82,8 @@ function Poller (opts = {}, target) {
       }
 
       return {
-        rev    : row.id,
         rows   : rowsFromSides(sides),
+        rev    : row.id,
         broker : row.broker,
         symbol : row.symbol
       }
@@ -92,9 +101,19 @@ function Poller (opts = {}, target) {
       .first()
       .flatMap(pollUpdate)
 
+  const validate = (prev, next) => {
+    const isNext = next.rev === nextRevOf(prev.rev)
+
+    if (isNext) return next
+
+    throw new Error('bad id')
+  }
+
   return update$
     .first()
     .switchMap(pollSnapshot)
+    .scan(validate)
+    .filter(identity)
 }
 
 const OPTIONS = {
@@ -103,4 +122,5 @@ const OPTIONS = {
 }
 
 Poller(OPTIONS, 'cexio/btc-usd')
+  .retry(Infinity)
   .subscribe(console.log)
