@@ -18,7 +18,8 @@ const {
 
 const parseArr = compose(
   fromPairs,
-  splitEvery(2)
+  splitEvery(2),
+  map(String)
 )
 
 const parseEntry = pair => {
@@ -26,7 +27,7 @@ const parseEntry = pair => {
 
   const entry =  parseArr(arr)
 
-  return assoc('id', id, entry)
+  return assoc('id', String(id), entry)
 }
 
 function obwatch (db, target, rev = '$', timeout = 1000) {

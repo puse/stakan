@@ -6,7 +6,7 @@ const {
  * Settings
  */
 
-const PREFIX = 'orderbook'
+const PREFIX = 'orderbooks'
 
 /**
  * Helpers
