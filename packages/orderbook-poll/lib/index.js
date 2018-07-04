@@ -116,11 +116,4 @@ function Poller (opts = {}, target) {
     .filter(identity)
 }
 
-const OPTIONS = {
-  mqtt: { url: 'mqtt://localhost:1883' },
-  http: { baseURL: 'http://localhost:8080' }
-}
-
-Poller(OPTIONS, 'cexio/btc-usd')
-  .retry(Infinity)
-  .subscribe(console.log)
+module.exports = Poller
