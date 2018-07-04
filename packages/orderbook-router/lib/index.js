@@ -10,10 +10,10 @@ function read ({ redis } = {}) {
   }
 }
 
-function createRouter (opts) {
-  const router = new Router({
-    prefix: '/orderbooks'
-  })
+function createRouter (opts = {}) {
+  const { prefix, redis } = opts
+
+  const router = new Router({ prefix })
 
   router.get('/:broker/:symbol', read(opts))
 

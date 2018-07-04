@@ -19,9 +19,18 @@ const {
 const Source = require('@stakan/orderbook-source-cexio')
 
 /**
- * Helpers
+ * Settings
  */
 
+const SYMBOLS = ['btc-usd', 'eth-usd', 'btc-eur', 'eth-eur']
+
+/**
+ *
+ */
+
+const fromSymbol = symbol =>
+  Source(symbol)
+    .retry(Infinity)
 
 /**
  * Init
@@ -42,7 +51,12 @@ async function sync (patch) {
   return obadd(db, patch).then(commit)
 }
 
-Source('btc-usd')
-  .retryWhen(identity)
+Observable
+  .from(SYMBOLS)
+  .flatMap(fromSymbol)
   .flatMap(sync)
-  .subscribe(console.log, identity, _ => console.log('END'))
+  .subscribe({
+    next: identity,
+    error: err => debug('Error: ', err.message),
+    complete: _ => debug('Complete for %o', SYMBOLS)
+  })
