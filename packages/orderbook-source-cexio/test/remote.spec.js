@@ -13,5 +13,3 @@ test('send', async t => {
     .subscribe(ws, 'btc-usd')
     .then(console.log)
 })
-
-

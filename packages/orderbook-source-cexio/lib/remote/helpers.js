@@ -1,10 +1,14 @@
 const {
+  curry,
   compose,
+  concat,
+  assoc,
   toUpper,
   toLower,
   split,
   replace,
-  zipObj
+  zipObj,
+  map
 } = require('ramda')
 
 const symbolToPair = compose(
@@ -19,8 +23,28 @@ const symbolFrom = compose(
 
 const rowFrom = zipObj(['price', 'amount'])
 
+const rowOf = side => compose(
+  assoc('side', side),
+  zipObj(['price', 'amount'])
+)
+
+function patchFor (symbol, session, raw) {
+  const broker = 'cexio'
+
+  const bids = map(rowOf('bids'), raw.bids)
+  const asks = map(rowOf('asks'), raw.asks)
+
+  return {
+    broker,
+    symbol,
+    session,
+    rows: concat(bids, asks)
+  }
+}
+
 module.exports = {
   symbolToPair,
   symbolFrom,
-  rowFrom
+  rowFrom,
+  patchFor: curry(patchFor)
 }
