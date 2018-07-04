@@ -16,8 +16,12 @@ local hincr = function (key, field)
 end
 
 local xadd = function (key, id, data)
-  -- local params = { "MAXLEN", "~", 1000 }
-  return redis.call("XADD", key, id, unpack(data))
+  return redis.call(
+    "XADD", key,
+    "MAXLEN", "~", 1000,
+    id,
+    unpack(data)
+  )
 end
 
 --

@@ -2,7 +2,9 @@ import test from 'ava'
 
 import { Command } from 'ioredis'
 
-import Redis from '..'
+import Redis from '@stakan/redis'
+
+import { obcommit } from '..'
 
 /**
  *
@@ -106,20 +108,16 @@ test.serial('import', async t => {
 
   const ids = await addEntries({ seed: 1 }, entries)
 
-  await redis
-    .obcommit(TOPIC, '1-2')
+  await obcommit(redis, TOPIC, '1-2')
     .then(assertRev(null, 'bad start'))
 
-  await redis
-    .obcommit(TOPIC, 0, ids[2])
+  await obcommit(redis, TOPIC, 0, ids[2])
     .then(assertRev('1-3'))
 
-  await redis
-    .obcommit(TOPIC, '1-4', '1-5')
+  await obcommit(redis, TOPIC, '1-4', '1-5')
     .then(rev => t.is(rev, '1-5', 'ok start end'))
 
-  await redis
-    .obcommit(TOPIC)
+  await obcommit(redis, TOPIC)
     .then(rev => t.is(rev, '1-6', 'internal rev as start, till end'))
 
   await redis
@@ -143,8 +141,7 @@ test.serial('next seed', async t => {
 
   const ids = await addEntries({ seed: 2 }, entries)
 
-  await redis
-    .obcommit(TOPIC )
+  await obcommit(redis, TOPIC)
 
   await redis
     .zrangebylex(keyFor('bids'), '-', '+')

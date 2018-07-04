@@ -1,6 +1,7 @@
 {
-  "name": "@stakan/orderbook-router",
+  "name": "@stakan/redis",
   "version": "0.0.1",
+  "description": "Redis client enhanced with domain commands",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib"
@@ -9,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@stakan/orderbook-db-methods": "*",
-    "koa-router": "^7.4.0"
+    "ioredis": "^3.2.2",
+    "ramda": "^0.25.0"
   }
 }

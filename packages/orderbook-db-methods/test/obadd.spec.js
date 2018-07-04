@@ -3,6 +3,7 @@ import test from 'ava'
 import { Command } from 'ioredis'
 
 import {
+  times,
   compose,
   splitEvery,
   assoc,
@@ -10,7 +11,9 @@ import {
   fromPairs
 } from 'ramda'
 
-import Redis from '..'
+import Redis from '@stakan/redis'
+
+import { obadd } from '..'
 
 /**
  *
@@ -21,7 +24,7 @@ const CONFIG = {
   // db: 1
 }
 
-const TOPIC = 'hopar:exo-nyx'
+const TOPIC = 'hopar/exo-nyx'
 
 /**
  * Helpers
@@ -30,8 +33,14 @@ const TOPIC = 'hopar:exo-nyx'
 const keyFor = sub =>
   `${TOPIC}:ob:${sub}`
 
-const Entry = (price, amount = 1) =>
-  ({ price, amount })
+const rowOf = (side, price, amount = 1) =>
+  ({ side, price, amount })
+
+const BidRow = (...args) =>
+  rowOf('bids', ...args)
+
+const AskRow = (...args) =>
+  rowOf('asks', ...args)
 
 /**
  *
@@ -42,6 +51,19 @@ const redis = new Redis(CONFIG)
 /**
  * Commands
  */
+
+async function card () {
+  const key = keyFor('log')
+
+  const options = {
+    replyEncoding: 'utf8'
+  }
+
+  const cmd = new Command('xlen', [ key ], options)
+
+  return redis
+    .sendCommand(cmd)
+}
 
 async function fetchEntries (start = '-', end = '+') {
   const key = keyFor('log')
@@ -81,23 +103,32 @@ const tearDown = _ => {
 }
 
 test.before(tearDown)
-test.after.always(tearDown)
+test.afterEach.always(tearDown)
 
 test.serial('add', async t => {
-  await redis
-    .obadd(TOPIC, 1, [ Entry(24.5) ], [ Entry(25) ])
+  const add = (...args) => obadd(redis, ...args)
+
+  const ob1 = {
+    broker: 'hopar',
+    symbol: 'exo-nyx',
+    session: 1,
+    rows: [
+      BidRow(24.5),
+      AskRow(25)
+    ]
+  }
+
+  await add(ob1)
     .then(revs => {
       t.deepEqual(revs, [ '1-1', '1-2' ])
     })
 
-  await redis
-    .obadd(TOPIC, 1, [], [ Entry(26) ])
+  await add(TOPIC, 1, [ AskRow(26) ])
     .then(revs => {
       t.deepEqual(revs, ['1-3'], 'good revs')
     })
 
-  await redis
-    .obadd(TOPIC, 2, [ Entry(24) ])
+  await add(TOPIC, 2, [ BidRow(24) ])
     .then(revs => {
       t.deepEqual(revs, ['2-1'], 'reset offset')
     })
@@ -113,4 +144,18 @@ test.serial('add', async t => {
 
       t.deepEqual(entries, expected)
     })
+})
+
+test.serial('capped', async t => {
+  let offset = 10000
+  const step = 20
+
+  while (offset = offset - step) {
+    const rows = times(BidRow, step)
+    await obadd(redis, TOPIC, 1, rows)
+  }
+
+  const size = await card()
+
+  t.true(size < 1200, 'near 1000')
 })

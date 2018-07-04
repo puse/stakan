@@ -1,13 +1,57 @@
 import test from 'ava'
 
-import RH from '../lib/remote/helpers'
+import * as RH from '../lib/remote/helpers'
 
-test('symbols', t => {
+const raw = {
+  timestamp: 1530662457,
+  bids:
+    [ [ 6503.9, 0.05  ],
+      [ 6503.6, 1.094  ],
+      [ 6503.3, 0.7426  ],
+      [ 6502.3, 0.3499  ],
+      [ 6498.5, 0.002  ],
+      [ 6497.3, 0.3499  ],
+      [ 6496.4, 0.15205191  ],
+      [ 6493.6, 0.3499  ],
+      [ 6486.6, 0.9499  ],
+      [ 6485.5, 0.5  ],
+      [ 6485.3, 0.4695126  ],
+      [ 6483.5, 0.18  ],
+      [ 6483.4, 3.47501981  ],
+      [ 6478, 1.94249191  ],
+      [ 6477.7, 1.81929921  ] ],
+  asks:
+    [ [ 6517, 0.002  ],
+      [ 6523.2, 0.648  ],
+      [ 6523.3, 0.475  ],
+      [ 6523.5, 0.17  ],
+      [ 6530.9, 0.1284  ],
+      [ 6531, 0.00501943  ],
+      [ 6536.6, 0.3  ],
+      [ 6542.1, 0.00200027  ],
+      [ 6542.7, 0.5  ],
+      [ 6542.8, 30  ],
+      [ 6546.4, 0.12187075  ],
+      [ 6546.9, 0.318  ],
+      [ 6547, 2  ],
+      [ 6548.2, 1.63843584  ],
+      [ 6548.3, 0.3499  ] ],
+  pair: 'BTC:USD',
+  id: 285014631,
+  sell_total: '1492.90004173',
+  buy_total: '4878011.57'
+}
 
+
+test('recover', t => {
   const symbol = 'btc-usd'
-  const pair   = ['BTC', 'USD']
+  const session = 1
 
-  t.deepEqual(RH.pairFromSymbol(symbol), pair)
-  t.deepEqual(RH.pairToSymbol(pair), symbol)
+  const recover = RH.patchFor(symbol, session)
+
+  t.is(typeof recover, 'function')
+
+  const res = recover(raw)
+
+  t.true(Array.isArray(res.rows))
 })
-
