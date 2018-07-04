@@ -5,12 +5,16 @@ const { Observable } = require('rxjs/Rx')
 const {
   head,
   last,
-  props,
   juxt,
   identity
 } = require('ramda')
 
-const OrderbookDB = require('@stakan/orderbook-db')
+const Redis = require('@stakan/redis')
+
+const {
+  obadd,
+  obcommit
+} = require('@stakan/orderbook-db-methods')
 
 const Source = require('@stakan/orderbook-source-cexio')
 
@@ -23,28 +27,19 @@ const Source = require('@stakan/orderbook-source-cexio')
  * Init
  */
 
-const db = new OrderbookDB()
+const db = new Redis()
 
 /**
  *
  */
 
 async function sync (patch) {
-  const { broker, symbol } = patch
-
-  const topic = `${broker}/${symbol}`
-
-  const add = args => {
-    const parsed = props(['session', 'bids', 'asks'])
-    return db.obadd(topic, ...parsed(args))
-  }
-
-  const commit = args => {
+  const commit = range => {
     const parsed = juxt([ head, last ])
-    return db.obcommit(topic, ...parsed(args))
+    return obcommit(db, patch, ...parsed(range))
   }
 
-  return add(patch).then(commit)
+  return obadd(db, patch).then(commit)
 }
 
 Source('btc-usd')
