@@ -6,7 +6,6 @@
     "test": "ava -s"
   },
   "dependencies": {
-    "ioredis": "^3.2.2",
     "ramda": "^0.25.0"
   },
   "devDependencies": {

@@ -2,6 +2,8 @@ const Redis = require('ioredis')
 
 const setupScripts = require('./scripts')
 
+const { Command } = Redis
+
 /**
  *
  */
@@ -11,6 +13,12 @@ class Client extends Redis {
     super(...args)
 
     setupScripts(this)
+  }
+
+  xread (...args) {
+    const cmd = new Command('xread', args)
+
+    return this.sendCommand(cmd)
   }
 }
 

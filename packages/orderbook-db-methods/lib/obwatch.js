@@ -1,5 +1,3 @@
-const { Command } = require('ioredis')
-
 const {
   merge,
   compose,
@@ -17,9 +15,6 @@ const {
 /**
  * Helpers
  */
-
-const commandOf = (key, args) =>
-  new Command(key, args, { replyEncoding: 'utf8' })
 
 const parseArr = compose(
   fromPairs,
@@ -43,8 +38,6 @@ function obwatch (db, target, rev = '$', timeout = 1000) {
     'streams', key, rev
   ]
 
-  const cmd = commandOf('xread', args)
-
   const rowOf = compose(
     merge(params),
     parseEntry
@@ -56,7 +49,7 @@ function obwatch (db, target, rev = '$', timeout = 1000) {
       : result
 
   return db
-    .sendCommand(cmd)
+    .xread(...args)
     .then(recover)
 }
 
