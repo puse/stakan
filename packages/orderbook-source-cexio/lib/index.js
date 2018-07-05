@@ -12,14 +12,12 @@ const { subscribe } = require('./remote')
 
 const {
   symbolFrom,
-  rowFrom
+  patchFor,
 } = require('./remote/helpers')
 
 /**
  * Helpers
  */
-
-const formatRows = map(rowFrom)
 
 /**
  * Setup
@@ -32,8 +30,6 @@ const pool = createPool()
  */
 
 function Remote (symbol) {
-  const broker = 'cexio'
-
   const sync = observer => ws => {
     const session = Date.now()
     let offset = null
@@ -46,13 +42,7 @@ function Remote (symbol) {
     const publish = data => {
       if (data.id !== offset++) return report('Bad id')
 
-      const payload = {
-        session,
-        broker,
-        symbol: symbolFrom(data.pair),
-        bids: formatRows(data.bids),
-        asks: formatRows(data.asks)
-      }
+      const payload = patchFor(symbol, session, data)
 
       observer.next(payload)
     }

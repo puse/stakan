@@ -43,7 +43,7 @@ const STATE_DICT = {
  */
 
 const CONFIG = {
-  max: 2,
+  max: 100,
   testOnBorrow: true
 }
 
