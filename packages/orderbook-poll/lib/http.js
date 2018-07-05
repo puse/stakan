@@ -2,7 +2,7 @@ const { Observable } = require('rxjs/Rx')
 
 const Axios = require('axios')
 
-function Poller (opts, target) {
+function PollHttp (opts, target) {
   const {
     baseURL = '/api',
     interval = 1000
@@ -11,7 +11,7 @@ function Poller (opts, target) {
   const request = Axios.create({ baseURL })
 
   const poll = _ =>
-    request(`/orderbooks/${target}`)
+    request(`/${target}`)
       .then(x => x.data)
 
   return Observable
@@ -19,8 +19,4 @@ function Poller (opts, target) {
     .flatMap(poll)
 }
 
-module.exports = Poller
-
-// Poller({ baseURL: 'http://localhost:8080' }, 'cexio/btc-usd')
-//   .first()
-//   .subscribe(console.log)
+module.exports = PollHttp

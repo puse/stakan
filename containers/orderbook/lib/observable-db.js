@@ -1,33 +1,41 @@
 const { Observable } = require('rxjs/Rx')
 
 const {
-  last,
-  identity
+  is,
+  merge
 } = require('ramda')
 
-const Redis = require('@stakan/redis')
+const {
+  obwatch
+} = require('@stakan/orderbook-db-methods')
 
-const { obwatch } = require('@stakan/orderbook-db-methods')
+/**
+ * Helpers
+ */
 
-const db = new Redis()
+const isArray = is(Array)
 
-function Source (target) {
+function Source (db, target) {
   const { broker, symbol } = target
 
   const topic = `${broker}/${symbol}`
+
+  const complete = merge({ broker, symbol })
 
   const init = observer => {
     let rev = void 0
 
     const push = row => {
       rev = row.id
-      Object.assign(row, { broker, symbol })
-      observer.next(row)
+      observer.next(complete(row))
     }
+
+    const report = err =>
+      observer.error(err)
 
     const read = () => {
       const use = rows => {
-        if (!Array.isArray(rows)) return void 0
+        if (!isArray(rows)) return void 0
 
         rows.forEach(push)
       }
@@ -35,7 +43,7 @@ function Source (target) {
       return obwatch(db, topic, rev)
         .then(use)
         .then(read)
-        .catch(read)
+        .catch(report)
     }
 
     read()

@@ -4,7 +4,7 @@ const { Observable } = require('rxjs/Rx')
 
 const MQTT_URL = 'mqtt://localhost:1883'
 
-function Poller (opts, target) {
+function MollMqtt (opts, target) {
   const { url = MQTT_URL } = opts || {}
 
   const topic = `orderbooks/${target}`
@@ -33,4 +33,4 @@ function Poller (opts, target) {
   return Observable.create(poll)
 }
 
-module.exports = Poller
+module.exports = MollMqtt

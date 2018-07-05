@@ -96,11 +96,6 @@ function Poller (opts = {}, target) {
       .map(commit)
   }
 
-  const pollSnapshot = _ =>
-    pollHttp(opts.http, target)
-      .first()
-      .flatMap(pollUpdate)
-
   const validate = (prev, next) => {
     const isNext = next.rev === nextRevOf(prev.rev)
 
@@ -108,6 +103,11 @@ function Poller (opts = {}, target) {
 
     throw new Error('bad id')
   }
+
+  const pollSnapshot = _ =>
+    pollHttp(opts.http, target)
+      .first()
+      .flatMap(pollUpdate)
 
   return update$
     .first()
