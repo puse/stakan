@@ -16,10 +16,12 @@ export default new Router({
           symbol: 'btc-usd'
         }
       }
-    }, {
+    },
+    {
       name: 'orderbook',
       path: '/orderbook/:broker/:symbol',
-      component: Orderbook
+      component: Orderbook,
+      props: true
     }
   ]
 })

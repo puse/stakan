@@ -1,18 +1,15 @@
 <template lang="pug">
   div
-    el-row(:gutter="20")
+    el-row(v-if="snapshot$"
+      :gutter="20")
 
       el-col(:span="12")
         h3 Sell orders
-        orderbook-table(
-          v-if="stream"
-          :dataset="asksData")
+        orderbook-table(:members="bids")
 
       el-col(:span="12")
         h3 Buy orders
-        orderbook-table(
-          v-if="stream"
-          :dataset="bidsData")
+        orderbook-table(:members="asks")
 </template>
 
 <script src="./main.js"></script>

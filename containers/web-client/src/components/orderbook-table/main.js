@@ -5,15 +5,8 @@ import {
   zipObj
 } from 'ramda'
 
-const computed = {
-  members () {
-    const zipped = zipObj(['price', 'quantity'])
-    return map(zipped, this.dataset)
-  }
-}
-
 const props = {
-  dataset: {
+  members: {
     type: Array,
     default: []
   }
@@ -21,7 +14,6 @@ const props = {
 
 export default {
   name: 'orderbook-table',
-  props,
-  computed
+  props
 }
 

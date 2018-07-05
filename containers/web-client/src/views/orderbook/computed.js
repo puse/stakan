@@ -1,33 +1,54 @@
 import {
-  prop,
-  reverse,
   compose,
+  prop,
+  propEq,
+  props,
+  reverse,
+  filter,
   sortBy,
-  head
+  join
 } from 'ramda'
 
-const sortedByPrice = sortBy(head)
+const sortedByPrice = sortBy(prop('price'))
 
-function bidsData () {
+function topic () {
+  const op = compose(
+    join('/'),
+    props(['broker', 'symbol'])
+  )
+
+  return op(this)
+}
+
+function bids () {
+  const { snapshot$ } = this
+
+  if (!snapshot$) return []
+
   const op = compose(
     reverse,
     sortedByPrice,
-    prop('bids')
+    filter(propEq('side', 'bids'))
   )
 
-  return op(this.stream)
+  return op(snapshot$.rows)
 }
 
-function asksData () {
+function asks () {
+  const { snapshot$ } = this
+
+  if (!snapshot$) return []
+
   const op = compose(
     sortedByPrice,
-    prop('asks')
+    filter(propEq('side', 'asks'))
   )
 
-  return op(this.stream)
+  return op(snapshot$.rows)
 }
 
 export {
-  bidsData,
-  asksData
+  topic,
+  bids,
+  asks
 }

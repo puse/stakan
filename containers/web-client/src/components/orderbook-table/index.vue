@@ -6,12 +6,11 @@ el-table(
 
   el-table-column(
     label="Price"
-    prop="price"
-    :sortable="true")
+    prop="price")
 
   el-table-column(
-    label="Quantity"
-    prop="quantity")
+    label="Amount"
+    prop="amount")
 </template>
 
 <script src="./main.js"> </script>
