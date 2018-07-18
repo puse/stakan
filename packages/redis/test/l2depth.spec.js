@@ -4,8 +4,8 @@ import Redis from '..'
 
 const db = new Redis()
 
-const topic = 'T'
-const rev = '1-1'
+// const topic = 'T'
+// const rev = '1-1'
 
 test.before(async _ => {
   await db.set('T:rev', '1-1')
@@ -22,7 +22,7 @@ test('x', async t => {
       const [ rev, bids, asks ] = res
 
       t.is(rev, '1-1')
-      t.deepEqual(bids, ['99', '1'])
+      t.deepEqual(bids, ['99', '1'], 'skip void')
       t.deepEqual(asks, ['100', '1', '101', '1'])
     })
 

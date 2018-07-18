@@ -4,16 +4,12 @@ import Redis from '..'
 
 const db = new Redis()
 
-const topic = 'cexio:eth-usd'
-
-const seed = Date.now()
-
 test.before(async _ => {
   let offset = 1
 
   const xadd = (side, price, amount) => {
-    const key = `${topic}:log`
-    const id = `${seed}-${offset++}`
+    const key = `T:log`
+    const id = `1-${offset++}`
 
     const row = [
       'side', side,
@@ -21,7 +17,7 @@ test.before(async _ => {
       'amount', amount
     ]
 
-    db.xadd(key, id, ...row)
+    db.xadd('T:log', id, ...row)
   }
 
   const ps = [
@@ -37,21 +33,19 @@ test.before(async _ => {
 test.after.always(_ => db.flushdb())
 
 test.serial('import one', async t => {
-  const end = `${seed}-1`
-
   await db
-    .l2commit(topic, 0, end)
+    .l2commit('T', 0, '1-1')
     .then(rev => {
-      t.is(rev, `${seed}-1`)
+      t.is(rev, '1-1')
     })
 
 })
 
 test.serial('import rest', async t => {
   await db
-    .l2commit(topic)
+    .l2commit('T')
     .then(rev => {
-      t.is(rev, `${seed}-4`)
+      t.is(rev, '1-4')
     })
 })
 
@@ -61,18 +55,18 @@ test.serial('results', async t => {
 
   // res
   await db
-    .get(`${topic}:rev`)
-    .then(rev => t.is(rev, `${seed}-4`))
+    .get('T:rev')
+    .then(rev => t.is(rev, '1-4'))
 
   await db
-    .zrangebylex(`${topic}:bids`, '-', '+')
+    .zrangebylex('T:bids', '-', '+')
     .then(scaleAll)
     .then(bids => {
       t.deepEqual(bids, [ 499 ])
     })
 
   await db
-    .zrangebylex(`${topic}:asks`, '-', '+')
+    .zrangebylex('T:asks', '-', '+')
     .then(scaleAll)
     .then(asks => {
       t.deepEqual(asks, [ 500 ])
