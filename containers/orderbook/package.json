@@ -12,15 +12,15 @@
     "pm2": "^3.0.0"
   },
   "dependencies": {
-    "@stakan/redis": "*",
     "@stakan/orderbook-db-methods": "*",
-    "@stakan/orderbook-router": "*",
     "@stakan/orderbook-source-cexio": "*",
     "@stakan/publisher": "*",
+    "@stakan/redis": "*",
     "debug": "^3.1.0",
     "getenv": "^0.7.0",
     "koa": "^2.5.1",
     "koa-logger": "^3.2.0",
+    "koa-router": "^7.4.0",
     "ramda": "^0.25.0",
     "ramda-adjunct": "^2.9.0",
     "rxjs": "^6.2.0",
