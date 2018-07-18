@@ -1,4 +1,4 @@
-# Orderbook scripts
+# Orderbook DB methods
 
 
 ## Schema
@@ -21,6 +21,8 @@
 ## API
 
 ### Instance methods
+
+Level 2 aggregation methods
 
 #### `l2add`
 
