@@ -15,6 +15,12 @@ class Client extends Redis {
     setupScripts(this)
   }
 
+  xadd (...args) {
+    const cmd = new Command('xadd', args, 'utf8')
+
+    return this.sendCommand(cmd)
+  }
+
   xread (...args) {
     const cmd = new Command('xread', args, 'utf8')
 

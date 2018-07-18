@@ -7,6 +7,8 @@ const db = new Redis()
 const target = 'cexio:eth-usd'
 const seed = Date.now()
 
+test.after.always(_ => db.flushdb())
+
 test.serial('single', async t => {
   await db
     .l2add(target, seed, 'bids', 500, 1)
