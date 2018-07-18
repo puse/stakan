@@ -1,4 +1,4 @@
-# Orderbook scripts
+# Orderbook DB methods
 
 
 ## Schema
@@ -22,7 +22,9 @@
 
 ### Instance methods
 
-#### `obadd`
+Level 2 aggregation methods
+
+#### `l2add`
 
 **Arguments**
 
@@ -42,21 +44,23 @@ const bids = [ { price: 24.8, amount: 1.8 } ]
 const asks = [ { price: 25.2, amount: 2 } ]
 
 client
-  .obadd('hopar:exo-nyx', seed, bids, asks)
+  .l2add('hopar:exo-nyx', seed, bids, asks)
   .then(console.log)
 
 // ['1530060819000-1', '1530060819000-2']
 ```
 
-#### `obcommit`
+#### `l2commit`
 
 - `topic`
 - `start` - By default last cached ref or `0-0`
 - `end` - Last id to fetch
 
-#### `obdepth`
+#### `l2depth`
 
-#### `obwatch`
+- `topic`
+
+#### `l2watch`
 
 **Arguments**
 

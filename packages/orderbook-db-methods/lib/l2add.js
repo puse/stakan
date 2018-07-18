@@ -26,7 +26,7 @@ const parseArgs = compose(
   groupBy(prop('side')) // { bids: [{}, ...], ... }
 )
 
-function obadd (db, data, ...rest) {
+function l2add (db, data, ...rest) {
   let session, rows
 
   if (rest.length === 0) {
@@ -42,7 +42,7 @@ function obadd (db, data, ...rest) {
   const args = parseArgs(rows || data.rows)
 
   return db
-    .obadd(uri, session, ...args)
+    .l2add(uri, session, ...args)
 }
 
-module.exports = obadd
+module.exports = l2add

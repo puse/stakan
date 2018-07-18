@@ -4,7 +4,7 @@ import { Command } from 'ioredis'
 
 import Redis from '@stakan/redis'
 
-import { obcommit } from '..'
+import { l2commit } from '..'
 
 /**
  *
@@ -22,7 +22,7 @@ const TOPIC = 'hopar:exo-nyx'
  */
 
 const keyFor = sub =>
-  `${TOPIC}:ob:${sub}`
+  `${TOPIC}:${sub}`
 
 const Entry = (side, price, amount = 1) => [
   'side', side,
@@ -108,16 +108,16 @@ test.serial('import', async t => {
 
   const ids = await addEntries({ seed: 1 }, entries)
 
-  await obcommit(redis, TOPIC, '1-2')
+  await l2commit(redis, TOPIC, '1-2')
     .then(assertRev(null, 'bad start'))
 
-  await obcommit(redis, TOPIC, 0, ids[2])
+  await l2commit(redis, TOPIC, 0, ids[2])
     .then(assertRev('1-3'))
 
-  await obcommit(redis, TOPIC, '1-4', '1-5')
+  await l2commit(redis, TOPIC, '1-4', '1-5')
     .then(rev => t.is(rev, '1-5', 'ok start end'))
 
-  await obcommit(redis, TOPIC)
+  await l2commit(redis, TOPIC)
     .then(rev => t.is(rev, '1-6', 'internal rev as start, till end'))
 
   await redis
@@ -141,7 +141,7 @@ test.serial('next seed', async t => {
 
   const ids = await addEntries({ seed: 2 }, entries)
 
-  await obcommit(redis, TOPIC)
+  await l2commit(redis, TOPIC)
 
   await redis
     .zrangebylex(keyFor('bids'), '-', '+')

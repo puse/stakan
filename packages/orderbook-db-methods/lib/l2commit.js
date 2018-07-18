@@ -4,10 +4,10 @@ const {
   targetToString
 } = require('./helpers')
 
-function obcommit (redis, target, ...range) {
+function l2commit (redis, target, ...range) {
   const key = targetToString(target)
 
-  return redis.obcommit(key, ...range)
+  return redis.l2commit(key, ...range)
 }
 
-module.exports = obcommit
+module.exports = l2commit
