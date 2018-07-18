@@ -10,8 +10,8 @@ const {
 } = require('ramda')
 
 const {
-  obadd,
-  obcommit
+  l2add,
+  l2commit
 } = require('@stakan/orderbook-db-methods')
 
 /**
@@ -34,10 +34,10 @@ function Sink (db) {
   const next = patch => {
     const commit = ids => {
       const [start, end] = rangeFrom(ids)
-      return obcommit(db, patch, start, end)
+      return l2commit(db, patch, start, end)
     }
 
-    return obadd(db, patch).then(commit)
+    return l2add(db, patch).then(commit)
   }
 
   const error = err => debug('Error: ', err.message)

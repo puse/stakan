@@ -6,7 +6,7 @@ const {
 } = require('ramda')
 
 const {
-  obwatch
+  l2watch
 } = require('@stakan/orderbook-db-methods')
 
 /**
@@ -40,7 +40,7 @@ function Source (db, target) {
         rows.forEach(push)
       }
 
-      return obwatch(db, topic, rev)
+      return l2watch(db, topic, rev)
         .then(use)
         .then(read)
         .catch(report)
