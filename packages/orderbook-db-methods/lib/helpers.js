@@ -22,7 +22,7 @@ function targetToString (params) {
 
 function keyFor (root, sub) {
   const target = targetToUri(root)
-  return join(':', [ target, 'ob', sub ])
+  return join(':', [ target, sub ])
 }
 
 module.exports.targetFrom = targetFrom

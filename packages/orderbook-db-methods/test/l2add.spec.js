@@ -13,7 +13,7 @@ import {
 
 import Redis from '@stakan/redis'
 
-import { obadd } from '..'
+import { l2add } from '..'
 
 /**
  *
@@ -31,7 +31,7 @@ const TOPIC = 'hopar/exo-nyx'
  */
 
 const keyFor = sub =>
-  `${TOPIC}:ob:${sub}`
+  `${TOPIC}:${sub}`
 
 const rowOf = (side, price, amount = 1) =>
   ({ side, price, amount })
@@ -106,7 +106,7 @@ test.before(tearDown)
 test.afterEach.always(tearDown)
 
 test.serial('add', async t => {
-  const add = (...args) => obadd(redis, ...args)
+  const add = (...args) => l2add(redis, ...args)
 
   const ob1 = {
     broker: 'hopar',
@@ -152,7 +152,7 @@ test.serial('capped', async t => {
 
   while (offset = offset - step) {
     const rows = times(BidRow, step)
-    await obadd(redis, TOPIC, 1, rows)
+    await l2add(redis, TOPIC, 1, rows)
   }
 
   const size = await card()

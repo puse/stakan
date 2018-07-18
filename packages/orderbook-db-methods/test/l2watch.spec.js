@@ -4,7 +4,7 @@ import { Command } from 'ioredis'
 
 import Redis from '@stakan/redis'
 
-import { obwatch } from '..'
+import { l2watch } from '..'
 
 /**
  *
@@ -22,7 +22,7 @@ const TOPIC = 'hopar/exo-nyx'
  */
 
 const keyFor = sub =>
-  `${TOPIC}:ob:${sub}`
+  `${TOPIC}:${sub}`
 
 const rowOf = (side, price, amount = 1) => [
   'side', side,
@@ -105,13 +105,13 @@ test.serial('import', async t => {
     AskRow(25)
   ])
 
-  await obwatch(redis, TOPIC, '0')
+  await l2watch(redis, TOPIC, '0')
     .then(res => t.is(res.length, 2))
 
-  await obwatch(redis, TOPIC, '1-2')
+  await l2watch(redis, TOPIC, '1-2')
     .then(res => t.falsy(res))
 
-  const p3 = obwatch(redis, TOPIC, '1-2', 10000)
+  const p3 = l2watch(redis, TOPIC, '1-2', 10000)
 
   await addRows({ seed: 2 }, [ BidRow(24) ])
 

@@ -30,9 +30,9 @@ const parseEntry = pair => {
   return assoc('id', String(id), entry)
 }
 
-function obwatch (db, target, rev = '$', timeout = 1000) {
+function l2watch (db, target, rev = '$', timeout = 1000) {
   const params = targetFrom(target)
-  const key = targetToString(target) + ':ob:log'
+  const key = targetToString(target) + ':log'
 
   const args = [
     'BLOCK', timeout,
@@ -54,4 +54,4 @@ function obwatch (db, target, rev = '$', timeout = 1000) {
     .then(recover)
 }
 
-module.exports = obwatch
+module.exports = l2watch

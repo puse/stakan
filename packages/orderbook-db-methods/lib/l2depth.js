@@ -56,14 +56,14 @@ const recover = res => {
  *
  */
 
-function obdepth (db, params) {
+function l2depth (db, params) {
   const target = targetFrom(params)
   const uri = targetToString(target)
 
   return db
-    .obdepth(uri)
+    .l2depth(uri)
     .then(recover)
     .then(merge(target))
 }
 
-module.exports = obdepth
+module.exports = l2depth

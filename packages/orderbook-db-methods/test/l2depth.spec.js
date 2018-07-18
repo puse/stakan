@@ -2,7 +2,7 @@ import test from 'ava'
 
 import Redis from '@stakan/redis'
 
-import { obdepth } from '..'
+import { l2depth } from '..'
 
 /**
  *
@@ -20,7 +20,7 @@ const TOPIC = 'hopar/exo-nyx'
  */
 
 const keyFor = sub =>
-  `${TOPIC}:ob:${sub}`
+  `${TOPIC}:${sub}`
 
 const Entry = (price, amount = 1) =>
   [ amount, price ]
@@ -53,7 +53,7 @@ test.before(tearDown)
 
 test.after.always(tearDown)
 
-test.serial('obdepth', async t => {
+test.serial('l2depth', async t => {
   const bids = [
     1, 2400000000,
     1, 2450000000
@@ -68,7 +68,7 @@ test.serial('obdepth', async t => {
   await redis.zadd(keyFor('bids'), ...bids)
   await redis.zadd(keyFor('asks'), ...asks)
 
-  await obdepth(redis, TOPIC)
+  await l2depth(redis, TOPIC)
     .then(res => {
       const expeced = {
         broker: 'hopar',
