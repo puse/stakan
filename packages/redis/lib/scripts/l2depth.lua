@@ -1,3 +1,5 @@
+local topic = KEYS[1]
+
 -- Constants
 
 local SCALING_FACTOR = 100000000
@@ -5,7 +7,7 @@ local SCALING_FACTOR = 100000000
 -- Utils
 
 local function keyfor (sub)
-  return table.concat({ KEYS[1], "ob", sub }, ":")
+  return table.concat({ topic, sub }, ":")
 end
 
 local function unscaled (x)
@@ -18,7 +20,7 @@ end
 local function pull (side)
   local key = keyfor(side)
 
-  local arr = redis.call("ZRANGE", key, 0, -1, "WITHSCORES")
+  local arr = redis.call("ZRANGEBYSCORE", key, "(0", "+inf", "WITHSCORES")
 
   for i = 1, #arr, 2 do
     arr[i] = unscaled(arr[i])

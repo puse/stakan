@@ -11,10 +11,6 @@ end
 
 --
 
-local hincr = function (key, field)
-  return redis.call("HINCRBY", key, field, 1)
-end
-
 local xadd = function (key, id, data)
   return redis.call(
     "XADD", key,
@@ -27,7 +23,7 @@ end
 --
 
 local function next_id ()
-  local key = TOPIC .. ":ob:log:offset"
+  local key = TOPIC .. ":log:offset"
 
   local offset = redis.call("HINCRBY", key, SEED, 1)
 
@@ -35,7 +31,7 @@ local function next_id ()
 end
 
 local insert = function (data)
-  local key = TOPIC .. ":ob:log"
+  local key = TOPIC .. ":log"
 
   return xadd(key, next_id(), data)
 end
@@ -57,7 +53,7 @@ local side = nil
 while i <= l do
   local x = string.lower(ARGV[i])
 
-  if x == 'bids' or x == 'asks' then
+  if x == "bids" or x == "asks" then
     side = x
     i = i + 1
   end

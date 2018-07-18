@@ -42,7 +42,7 @@ end
 --
 
 local function keyfor (sub)
-  return join_by ":" { KEYS[1], 'ob', sub }
+  return join_by ":" { KEYS[1], sub }
 end
 
 local function scaled (x)
@@ -62,13 +62,11 @@ local function command (cmd)
     local key = keyfor(sub)
 
     if is_unary then
-      redis.debug(cmd, key)
       return redis.call(cmd, key)
     end
 
     return function (...)
       local params = flatten(arg)
-      redis.debug(cmd, key, params)
       return redis.call(cmd, key, unpack(params))
     end
   end
@@ -126,6 +124,10 @@ end
 local pull = function ()
   local res = command "XRANGE" "log" (xfrom, xto)
 
+  if not res then
+    return nil, nil
+  end
+
   local revs = {}
   local entries = {}
 
@@ -156,6 +158,10 @@ end
 --
 
 local entries, revs = pull()
+
+if not entries then
+  return nil
+end
 
 -- Mess
 
@@ -197,8 +203,6 @@ local asks = {}
 
 for i = nth, #entries do
   local entry = entries[i]
-
-  redis.debug(entry)
 
   if entry.side == "bids" then
     bids[entry.price] = entry.amount
