@@ -1,6 +1,6 @@
 const Router = require('koa-router')
 
-const { l2depth } = require('@stakan/orderbook-db-methods')
+const { l2depth } = require('@stakan/db-methods')
 
 function read ({ redis } = {}) {
   return async ctx => {

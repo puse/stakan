@@ -1,14 +1,8 @@
-const debug = require('debug')('stakan:ob:sink')
-
 const { Observable } = require('rxjs/Rx')
-
-const {
-  identity
-} = require('ramda')
 
 const Redis = require('@stakan/redis')
 
-const Source = require('@stakan/orderbook-source-cexio')
+const Source = require('@stakan/l2-source-cexio')
 
 const Subscribe = require('./lib/subscriber-db')
 

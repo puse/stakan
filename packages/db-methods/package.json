@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/orderbook-db-methods",
+  "name": "@stakan/db-methods",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {

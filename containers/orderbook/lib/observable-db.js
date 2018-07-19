@@ -5,9 +5,7 @@ const {
   merge
 } = require('ramda')
 
-const {
-  l2watch
-} = require('@stakan/orderbook-db-methods')
+const { l2watch } = require('@stakan/db-methods')
 
 /**
  * Helpers

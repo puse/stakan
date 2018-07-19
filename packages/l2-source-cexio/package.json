@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/orderbook-source-cexio",
+  "name": "@stakan/l2-source-cexio",
   "version": "0.0.1",
   "main": "lib/index.js",
   "directories": {

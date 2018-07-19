@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:orderbook:db')
+const debug = require('debug')('stakan:l2:db')
 
 const { Subscriber } = require('rxjs/Rx')
 
@@ -12,7 +12,7 @@ const {
 const {
   l2add,
   l2commit
-} = require('@stakan/orderbook-db-methods')
+} = require('@stakan/db-methods')
 
 /**
  * Helpers

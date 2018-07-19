@@ -12,10 +12,10 @@
     "pm2": "^3.0.0"
   },
   "dependencies": {
-    "@stakan/orderbook-db-methods": "*",
-    "@stakan/orderbook-source-cexio": "*",
-    "@stakan/mqtt-methods": "*",
     "@stakan/redis": "*",
+    "@stakan/db-methods": "*",
+    "@stakan/mqtt-methods": "*",
+    "@stakan/l2-source-cexio": "*",
     "debug": "^3.1.0",
     "getenv": "^0.7.0",
     "koa": "^2.5.1",
