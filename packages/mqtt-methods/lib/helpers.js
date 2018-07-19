@@ -1,8 +1,4 @@
 /**
- * Settings
- */
-
-/**
  * Helpers
  */
 
