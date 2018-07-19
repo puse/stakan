@@ -15,6 +15,10 @@ const {
 
 const isArray = is(Array)
 
+const extendFrom = ({ broker, symbol }) =>
+  merge({ scope: 'l2s', broker, symbol })
+
+
 /**
  *
  */
@@ -24,7 +28,7 @@ function Source (db, target) {
 
   const topic = `${broker}/${symbol}`
 
-  const complete = merge({ broker, symbol })
+  const complete = extendFrom(target)
 
   const init = observer => {
     let rev = void 0
