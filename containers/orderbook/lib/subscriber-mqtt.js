@@ -2,7 +2,7 @@ const debug = require('debug')('stakan:l2:mqtt')
 
 const { Subscriber } = require('rxjs/Rx')
 
-const { publish } = require('@stakan/publisher/lib/actions')
+const { publish } = require('@stakan/mqtt-methods')
 
 /**
  * Helpers

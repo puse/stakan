@@ -14,7 +14,7 @@
   "dependencies": {
     "@stakan/orderbook-db-methods": "*",
     "@stakan/orderbook-source-cexio": "*",
-    "@stakan/publisher": "*",
+    "@stakan/mqtt-methods": "*",
     "@stakan/redis": "*",
     "debug": "^3.1.0",
     "getenv": "^0.7.0",

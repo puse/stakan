@@ -1,32 +1,22 @@
 const { curry } = require('ramda')
 
-/**
- * Settings
- */
-
-const PREFIX = 'l2s'
-
-/**
- * Helpers
- */
-
-const topicOf = ({ broker, symbol }) =>
-  `${PREFIX}/${broker}/${symbol}`
-
-const messageOf = payload =>
-  JSON.stringify(payload)
-
-/**
- * Actions
- */
+const {
+  topicOf,
+  serialize
+} = require('./helpers')
 
 /**
  * Publish
+ *
+ * @param {mqtt.Client} client
+ * @param {Object} payload
+ *
+ * @returns {Promise}
  */
 
 async function publish (client, payload) {
   const topic   = topicOf(payload)
-  const message = messageOf(payload)
+  const message = serialize(payload)
 
   const options = { qos: 2 }
 
@@ -47,4 +37,4 @@ async function publish (client, payload) {
  * Expose curried
  */
 
-module.exports.publish = curry(publish)
+module.exports = curry(publish)

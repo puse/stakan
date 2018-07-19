@@ -1,7 +1,7 @@
 {
-  "name": "@stakan/publisher",
+  "name": "@stakan/mqtt-methods",
   "version": "0.0.1",
-  "description": "MQTT publisher",
+  "description": "MQTT methods",
   "main": "lib/index.js",
   "scripts": {
     "test": "ava"
