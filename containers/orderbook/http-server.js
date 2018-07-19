@@ -8,7 +8,7 @@ const logger = require('koa-logger')
 
 const Redis = require('@stakan/redis')
 
-const router = require('@stakan/orderbook-router')
+const router = require('./lib/router')
 
 /**
  * Settings

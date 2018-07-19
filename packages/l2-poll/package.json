@@ -1,0 +1,15 @@
+{
+  "name": "@stakan/l2-poll",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "node example/poll.js"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "mqtt": "^2.18.2",
+    "ramda": "^0.25.0",
+    "rxjs": "^6.2.1",
+    "rxjs-compat": "^6.2.1"
+  }
+}

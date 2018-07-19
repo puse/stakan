@@ -8,6 +8,10 @@ const { compose } = require('ramda')
 
 const PATH = `${__dirname}/scripts`
 
+/**
+ *
+ */
+
 const read = name => {
   const filename = `${PATH}/${name}.lua`
   return readFileSync(filename, 'utf8')
@@ -22,7 +26,7 @@ const compile = (name, numberOfKeys = 1) => redis => {
 }
 
 module.exports = compose(
-  compile('obadd'),
-  compile('obcommit'),
-  compile('obdepth')
+  compile('l2add'),
+  compile('l2commit'),
+  compile('l2depth')
 )

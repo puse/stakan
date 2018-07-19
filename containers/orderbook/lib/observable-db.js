@@ -5,9 +5,7 @@ const {
   merge
 } = require('ramda')
 
-const {
-  obwatch
-} = require('@stakan/orderbook-db-methods')
+const { l2watch } = require('@stakan/db-methods')
 
 /**
  * Helpers
@@ -15,12 +13,20 @@ const {
 
 const isArray = is(Array)
 
+const extendFrom = ({ broker, symbol }) =>
+  merge({ scope: 'l2s', broker, symbol })
+
+
+/**
+ *
+ */
+
 function Source (db, target) {
   const { broker, symbol } = target
 
   const topic = `${broker}/${symbol}`
 
-  const complete = merge({ broker, symbol })
+  const complete = extendFrom(target)
 
   const init = observer => {
     let rev = void 0
@@ -40,7 +46,7 @@ function Source (db, target) {
         rows.forEach(push)
       }
 
-      return obwatch(db, topic, rev)
+      return l2watch(db, topic, rev)
         .then(use)
         .then(read)
         .catch(report)
