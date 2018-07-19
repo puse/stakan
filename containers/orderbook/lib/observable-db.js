@@ -15,6 +15,10 @@ const {
 
 const isArray = is(Array)
 
+/**
+ *
+ */
+
 function Source (db, target) {
   const { broker, symbol } = target
 

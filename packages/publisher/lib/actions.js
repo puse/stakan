@@ -1,20 +1,20 @@
-const {
-  curry
-} = require('ramda')
+const { curry } = require('ramda')
 
 /**
  * Settings
  */
 
-const PREFIX = 'orderbooks'
+const PREFIX = 'l2s'
 
 /**
  * Helpers
  */
 
-const topicOf = ({ broker, symbol }) => {
-  return `${PREFIX}/${broker}/${symbol}`
-}
+const topicOf = ({ broker, symbol }) =>
+  `${PREFIX}/${broker}/${symbol}`
+
+const messageOf = payload =>
+  JSON.stringify(payload)
 
 /**
  * Actions
@@ -25,12 +25,10 @@ const topicOf = ({ broker, symbol }) => {
  */
 
 async function publish (client, payload) {
-  const topic = topicOf(payload)
-  const message = JSON.stringify(payload)
+  const topic   = topicOf(payload)
+  const message = messageOf(payload)
 
-  const options = {
-    qos: 2
-  }
+  const options = { qos: 2 }
 
   const sent = (resolve, reject) => {
     const cb = err => {

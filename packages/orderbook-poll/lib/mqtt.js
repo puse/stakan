@@ -7,7 +7,7 @@ const MQTT_URL = 'mqtt://localhost:1883'
 function MollMqtt (opts, target) {
   const { url = MQTT_URL } = opts || {}
 
-  const topic = `orderbooks/${target}`
+  const topic = `l2s/${target}`
 
   const poll = subscriber => {
     const client = mqtt.connect(url)
