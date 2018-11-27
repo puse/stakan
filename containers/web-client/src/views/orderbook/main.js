@@ -1,3 +1,4 @@
+import ElTime from '@/components/el-time'
 import L2Table from '@/components/l2-table'
 
 import subscriptions from './subscriptions'
@@ -14,6 +15,7 @@ export default {
   props,
   computed,
   components: {
+    ElTime,
     L2Table
   }
 }

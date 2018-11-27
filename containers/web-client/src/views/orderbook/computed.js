@@ -4,6 +4,7 @@ import {
   prop,
   props,
   reverse,
+  take,
   filter,
   whereEq,
   sortBy,
@@ -11,10 +12,18 @@ import {
 } from 'ramda'
 
 /**
+ *
+ */
+
+const LIMIT = 8
+
+/**
  * Helpers
  */
 
 const fromSide = side => {
+  const limited = take(LIMIT)
+
   const byPriceUp = sortBy(prop('price'))
 
   const sorted = side === 'bids'
@@ -23,7 +32,7 @@ const fromSide = side => {
 
   const relevant = filter(whereEq({ side }))
 
-  return compose(sorted, relevant)
+  return compose(limited, sorted, relevant)
 }
 
 const ordersFrom = applySpec({
@@ -31,17 +40,17 @@ const ordersFrom = applySpec({
   asks: fromSide('asks')
 })
 
+const topicFrom = compose(
+  join('/'),
+  props(['broker', 'symbol'])
+)
+
 /**
  * Computed
  */
 
 function topic () {
-  const op = compose(
-    join('/'),
-    props(['broker', 'symbol'])
-  )
-
-  return op(this)
+  return topicFrom(this)
 }
 
 function orders () {
