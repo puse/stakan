@@ -15,14 +15,7 @@ services:
       - "1883:1883"
       - "9001:9001"
 
-  orderbook:
-    build: ./containers/orderbook
+  verdaccio:
+    image: verdaccio/verdaccio
     ports:
-      - "80:80"
-    links:
-      - redis
-      - mosquitto
-    environment:
-      - ENV=production
-      - REDIS_URL=redis://redis:6379
-      - MQTT_URL=mqtt://mosquitto:1883
+      - "4873:4873"

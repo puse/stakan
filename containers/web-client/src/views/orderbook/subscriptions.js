@@ -1,4 +1,4 @@
-import Poll from '@stakan/orderbook-poll'
+import Poll from '@stakan/l2-poll'
 
 const CONFIG = {
   http: { baseURL: '/api' },

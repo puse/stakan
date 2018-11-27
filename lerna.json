@@ -3,7 +3,8 @@
   "packages": [
     "packages/*",
     "containers/web-client",
-    "containers/orderbook"
+    "containers/orderbook",
+    "xx/*"
   ],
   "version": "independent"
 }
