@@ -11,15 +11,6 @@ import {
 } from 'ramda'
 
 /**
- *
- */
-
-const EMPTY = {
-  bids: [],
-  asks: []
-}
-
-/**
  * Helpers
  */
 
@@ -56,7 +47,7 @@ function topic () {
 function orders () {
   const { snapshot$ } = this
 
-  if (!snapshot$) return EMPTY
+  if (!snapshot$) return {}
 
   return ordersFrom(snapshot$.rows)
 }

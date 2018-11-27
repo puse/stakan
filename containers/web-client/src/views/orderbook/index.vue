@@ -6,14 +6,14 @@
       el-col(:span="12")
         h3 Sell orders
 
-        orderbook-table(
+        l2-table(
           :side="bids"
           :members="orders.bids")
 
       el-col(:span="12")
         h3 Buy orders
 
-        orderbook-table(
+        l2-table(
           :side="asks"
           :members="orders.asks")
 </template>
