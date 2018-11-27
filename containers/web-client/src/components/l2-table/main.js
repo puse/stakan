@@ -13,7 +13,7 @@ const props = {
 }
 
 export default {
-  name: 'orderbook-table',
+  name: 'l2-table',
   props
 }
 
