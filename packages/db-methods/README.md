@@ -1,6 +1,5 @@
 # Orderbook DB methods
 
-
 ## Schema
 
 #### Identifier
