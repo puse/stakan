@@ -1,21 +1,20 @@
 <template lang="pug">
-div
-  span.prefix {{ prefix }}
-
-  time(:datetime="value")
-    | {{ displayValue }}
+el-tooltip(
+  placement="left"
+  :content="displayValue"
+  )
+    time.el-icon-time(
+      :datetime="value"
+      )
 </template>
 
 <script src="./main.js"> </script>
 
 <style scoped>
-div {
-  color: #666;
-  font-size: 12px;
+time {
+  padding: 5px 0;
+  line-height: 22px;
   font-family: monospace;
-}
-
-.prefix {
-  padding-right: 10px;
+  color: #666;
 }
 </style>

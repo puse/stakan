@@ -1,12 +1,10 @@
 <template lang="pug">
   div
     header.status-bar.clearfix
-      el-row(
-        :gutter="20")
-
-      el-breadcrumb.float-left
-        el-breadcrumb-item {{ broker }}
-        el-breadcrumb-item {{ symbol }}
+      target-select.float-left(
+        :broker="broker"
+        :symbol="symbol"
+        )
 
       el-time.float-right(
         prefix="Updated"
