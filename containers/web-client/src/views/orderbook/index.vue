@@ -1,9 +1,17 @@
 <template lang="pug">
   div
-    el-time(
-      prefix="Updated"
-      :display-relative="true"
-      :value="updateTime$")
+    header.status-bar.clearfix
+      el-row(
+        :gutter="20")
+
+      el-breadcrumb.float-left
+        el-breadcrumb-item {{ broker }}
+        el-breadcrumb-item {{ symbol }}
+
+      el-time.float-right(
+        prefix="Updated"
+        :display-relative="true"
+        :value="updateTime$")
 
     el-row(v-if="snapshot$"
       :gutter="20")
@@ -27,5 +35,10 @@
 h3 {
   font-weight: normal;
   color: #666;
+}
+
+.status-bar {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
 }
 </style>

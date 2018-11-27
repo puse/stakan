@@ -2,17 +2,20 @@
 div
   span.prefix {{ prefix }}
 
-  el-tag(type="info")
-    time(:datetime="value")
-      | {{ displayValue }}
+  time(:datetime="value")
+    | {{ displayValue }}
 </template>
 
 <script src="./main.js"> </script>
 
 <style scoped>
-.prefix {
+div {
   color: #666;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.prefix {
   padding-right: 10px;
-  font-size: 14px;
 }
 </style>
