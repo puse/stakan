@@ -1,15 +1,48 @@
 import {
+  applySpec,
   compose,
   prop,
-  propEq,
   props,
   reverse,
   filter,
+  whereEq,
   sortBy,
   join
 } from 'ramda'
 
-const sortedByPrice = sortBy(prop('price'))
+/**
+ *
+ */
+
+const EMPTY = {
+  bids: [],
+  asks: []
+}
+
+/**
+ * Helpers
+ */
+
+const fromSide = side => {
+  const byPriceUp = sortBy(prop('price'))
+
+  const sorted = side === 'bids'
+    ? compose(reverse, byPriceUp)
+    : byPriceUp
+
+  const relevant = filter(whereEq({ side }))
+
+  return compose(sorted, relevant)
+}
+
+const ordersFrom = applySpec({
+  bids: fromSide('bids'),
+  asks: fromSide('asks')
+})
+
+/**
+ * Computed
+ */
 
 function topic () {
   const op = compose(
@@ -20,35 +53,19 @@ function topic () {
   return op(this)
 }
 
-function bids () {
+function orders () {
   const { snapshot$ } = this
 
-  if (!snapshot$) return []
+  if (!snapshot$) return EMPTY
 
-  const op = compose(
-    reverse,
-    sortedByPrice,
-    filter(propEq('side', 'bids'))
-  )
-
-  return op(snapshot$.rows)
+  return ordersFrom(snapshot$.rows)
 }
 
-function asks () {
-  const { snapshot$ } = this
-
-  if (!snapshot$) return []
-
-  const op = compose(
-    sortedByPrice,
-    filter(propEq('side', 'asks'))
-  )
-
-  return op(snapshot$.rows)
-}
+/**
+ * Expose
+ */
 
 export {
   topic,
-  bids,
-  asks
+  orders
 }

@@ -5,11 +5,17 @@
 
       el-col(:span="12")
         h3 Sell orders
-        orderbook-table(:members="bids")
+
+        orderbook-table(
+          :side="bids"
+          :members="orders.bids")
 
       el-col(:span="12")
         h3 Buy orders
-        orderbook-table(:members="asks")
+
+        orderbook-table(
+          :side="asks"
+          :members="orders.asks")
 </template>
 
 <script src="./main.js"></script>
