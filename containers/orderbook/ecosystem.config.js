@@ -1,7 +1,7 @@
 const apps = [
   {
-    name: 'http-server.js',
-    script: './http-server.js',
+    name: 'server-api',
+    script: './server-api.js',
     env: {
       DEBUG: 'stakan:*',
       NODE_ENV: 'development',
@@ -9,13 +9,11 @@ const apps = [
       REDIS_URL: 'redis://localhost:6379'
     },
     env_production: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'production',
-      NODE_PORT: 80
+      NODE_ENV: 'production'
     }
   }, {
-    name: 'mqtt-publisher.js',
-    script: './mqtt-publisher.js',
+    name: 'publisher-mqtt',
+    script: './publisher-mqtt.js',
     env: {
       DEBUG: 'stakan:*',
       NODE_ENV: 'development',
@@ -23,12 +21,11 @@ const apps = [
       REDIS_URL: 'redis://localhost:6379'
     },
     env_production: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'production',
+      NODE_ENV: 'production'
     }
   }, {
-    name: 'cexio-connector.js',
-    script: './cexio-connector.js',
+    name: 'connector-cexio',
+    script: './connector-cexio.js',
     env: {
       DEBUG: 'stakan:*',
       NODE_ENV: 'development',
@@ -37,8 +34,7 @@ const apps = [
       CEXIO_API_SECRET: '5ATNU7Xm3UYZhGThIoAXiMTD4'
     },
     env_production: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'production',
+      NODE_ENV: 'production'
     }
   }
 ]
