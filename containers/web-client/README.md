@@ -1,6 +1,6 @@
 # web-client
 
-> Interface for Stakan
+> Web interface for Stakan
 
 ## Build Setup
 

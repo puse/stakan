@@ -1,8 +1,7 @@
 {
   "packages": [
     "packages/*",
-    "containers/web-client",
-    "containers/orderbook"
+    "app"
   ],
   "version": "independent"
 }

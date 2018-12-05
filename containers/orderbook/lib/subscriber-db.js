@@ -28,6 +28,10 @@ const rangeFrom = juxt([ head, last ])
  * @return {Rx.Subscriber}
  */
 
+/**
+ * TODO: handle db connection
+ */
+
 function Sink (db) {
   debug('Initialize DB subscriber')
 

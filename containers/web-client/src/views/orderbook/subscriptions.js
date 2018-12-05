@@ -1,4 +1,6 @@
-import Poll from '@stakan/orderbook-poll'
+import Poll from '@stakan/l2-poll'
+
+import { Subject } from 'rxjs/Rx'
 
 const CONFIG = {
   http: { baseURL: '/api' },
@@ -8,12 +10,19 @@ const CONFIG = {
 function subscriptions () {
   const { topic } = this
 
-  const snapshot$ = Poll(CONFIG, topic)
+  const snapshot$ = new Subject()
+
+  const updateTime$ = snapshot$
+    .map(_ => new Date())
+
+  Poll(CONFIG, topic)
     .throttleTime(100)
     .retry(Infinity)
+    .subscribe(snapshot$)
 
   return {
-    snapshot$
+    snapshot$,
+    updateTime$
   }
 }
 

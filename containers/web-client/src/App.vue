@@ -1,7 +1,7 @@
 <template lang="pug">
   el-container
     el-header
-      | Exo
+      | &nbsp;
     el-main.wrapper
       router-view
 </template>
@@ -12,9 +12,4 @@ export default {
 }
 </script>
 
-<style>
-.wrapper {
-  width: 960px;
-  margin: 20px auto;
-}
-</style>
+<style src="./style.css"> </style>

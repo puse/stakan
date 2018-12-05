@@ -1,8 +1,6 @@
-import OrderbookTable from '@/components/orderbook-table'
-
-import {
-  toPairs
-} from 'ramda'
+import TargetSelect from '@/components/target-select'
+import ElTime from '@/components/el-time'
+import L2Table from '@/components/l2-table'
 
 import subscriptions from './subscriptions'
 import * as computed from './computed'
@@ -18,6 +16,8 @@ export default {
   props,
   computed,
   components: {
-    OrderbookTable
+    TargetSelect,
+    ElTime,
+    L2Table
   }
 }
