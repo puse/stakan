@@ -1,8 +1,15 @@
 import test from 'ava'
 
-import Redis from '..'
+import Redis from 'ioredis'
+
+import { l2add } from '..'
 
 const db = new Redis()
+
+test.before(_ => {
+  const { lua, numberOfKeys = 1 } = l2add
+  db.defineCommand('l2add', { lua, numberOfKeys })
+})
 
 test.after.always(_ => db.flushdb())
 

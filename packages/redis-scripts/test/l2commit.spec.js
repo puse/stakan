@@ -1,24 +1,31 @@
 import test from 'ava'
 
-import Redis from '..'
+import Redis from 'ioredis'
+
+import { l2commit } from '..'
 
 const db = new Redis()
 
 test.before(async _ => {
+  const { lua, numberOfKeys = 1 } = l2commit
+  db.defineCommand('l2commit', { lua, numberOfKeys })
+
+  const key = `T:journal`
+
   let offset = 1
+  const nextOffset = () => offset++
 
-  const xadd = (side, price, amount) => {
-    const key = `T:log`
-    const id = `1-${offset++}`
+  const xaddTo = row => {
+    const rev = `1-${nextOffset()}`
+    return db.xadd(key, rev, ...row)
+  }
 
-    const row = [
+  const xadd = (side, price, amount) =>
+    xaddTo([
       'side', side,
       'price', price,
       'amount', amount
-    ]
-
-    db.xadd('T:log', id, ...row)
-  }
+    ])
 
   const ps = [
     xadd('bids', 500, 1),
@@ -27,7 +34,8 @@ test.before(async _ => {
     xadd('asks', 500, 1)
   ]
 
-  return Promise.all(ps)
+  return Promise
+    .all(ps)
 })
 
 test.after.always(_ => db.flushdb())
@@ -38,7 +46,6 @@ test.serial('import one', async t => {
     .then(rev => {
       t.is(rev, '1-1')
     })
-
 })
 
 test.serial('import rest', async t => {
@@ -55,18 +62,18 @@ test.serial('results', async t => {
 
   // res
   await db
-    .get('T:rev')
+    .get('T:data:rev')
     .then(rev => t.is(rev, '1-4'))
 
   await db
-    .zrangebylex('T:bids', '-', '+')
+    .zrangebylex('T:data:bids', '-', '+')
     .then(scaleAll)
     .then(bids => {
       t.deepEqual(bids, [ 499 ])
     })
 
   await db
-    .zrangebylex('T:asks', '-', '+')
+    .zrangebylex('T:data:asks', '-', '+')
     .then(scaleAll)
     .then(asks => {
       t.deepEqual(asks, [ 500 ])

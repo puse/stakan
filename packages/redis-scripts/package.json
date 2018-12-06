@@ -1,7 +1,7 @@
 {
-  "name": "@stakan/redis",
+  "name": "@stakan/redis-scripts",
   "version": "0.0.1",
-  "description": "Redis client enhanced with domain commands",
+  "description": "Lua scripts for Redis",
   "main": "lib/index.js",
   "directories": {
     "lib": "lib"
@@ -10,10 +10,10 @@
     "test": "ava -vs"
   },
   "dependencies": {
-    "@stakan/redis-scripts": "*",
-    "ioredis": "^4.2.0"
+    "ramda": "^0.25.0"
   },
   "devDependencies": {
+    "ioredis": "^4.2.0",
     "ava": "^0.25.0"
   }
 }

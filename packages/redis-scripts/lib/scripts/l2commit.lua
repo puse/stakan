@@ -1,76 +1,9 @@
--- Constants
-
-local SCALING_FACTOR = 100000000
-
 -- Utils
 
-local join_by = function (split)
-  return function (tbl)
-    return table.concat(tbl, split)
-  end
-end
+local L = require "modules/helpers"
 
-local insert_into = function (tbl)
-  return function (...)
-    for i = 1, #arg do
-      table.insert(tbl, arg[i])
-    end
-  end
-end
-
-local is_table = function (x)
-  return type(x) == "table"
-end
-
-local flatten = function (tbl)
-  local out = {}
-
-  local push = insert_into(out)
-
-  local function f (t)
-    for i = 1, #t do
-      local v = t[i]
-      if is_table(v) then f(v) else push(v) end
-    end
-  end
-
-  f(tbl)
-
-  return out
-end
-
---
-
-local function keyfor (sub)
-  return join_by ":" { KEYS[1], sub }
-end
-
-local function scaled (x)
-  return tonumber(x) * SCALING_FACTOR
-end
-
--- Redis helpers
-
-local function command (cmd)
-  cmd = string.lower(cmd)
-
-  local is_unary = false
-    or cmd == "get"
-    or cmd == "del"
-
-  return function (sub)
-    local key = keyfor(sub)
-
-    if is_unary then
-      return redis.call(cmd, key)
-    end
-
-    return function (...)
-      local params = flatten(arg)
-      return redis.call(cmd, key, unpack(params))
-    end
-  end
-end
+local scale = require "modules/scale"
+local command = require "modules/command"
 
 --
 
@@ -88,7 +21,8 @@ local next_rev_of = function (rev)
 
   local seed, offset = split_rev(rev)
 
-  return join_by "-" { seed, offset + 1 }
+  local suffix = offset + 1
+  return seed.."-"..suffix
 end
 
 local entry_from = function (arr)
@@ -106,7 +40,7 @@ end
 
 -- parse env data
 
-local rev_x = command "GET" "rev"
+local rev_x = command "GET" "data:rev"
 
 -- parse args
 
@@ -116,13 +50,13 @@ local xto   = ARGV[2] or "+"
 --
 
 local tear_down = function ()
-  command "DEL" "bids"
-  command "DEL" "asks"
-  command "DEL" "rev"
+  command "DEL" "data:bids"
+  command "DEL" "data:asks"
+  command "DEL" "data:rev"
 end
 
 local pull = function ()
-  local res = command "XRANGE" "log" (xfrom, xto)
+  local res = command "XRANGE" "journal" (xfrom, xto)
 
   if not res then
     return nil, nil
@@ -145,14 +79,16 @@ local commit = function (side, data)
 
   local members = {}
 
-  local push = insert_into(members)
+  local push = L.insert_into(members)
 
   for price, amount in pairs(data) do
-    push(amount, scaled(price))
+    push(amount, scale.convert(price))
   end
 
-  command "ZADD" (side) (members)
-  command "ZREMRANGEBYSCORE" (side) ("-inf", 0)
+  local key = "data:"..side
+
+  command "ZADD" (key) (members)
+  command "ZREMRANGEBYSCORE" (key) ("-inf", 0)
 end
 
 --
@@ -218,6 +154,6 @@ commit("asks", asks)
 
 local rev = revs[#revs]
 
-command "SET" "rev" (rev)
+command "SET" "data:rev" (rev)
 
 return rev
