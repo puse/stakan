@@ -30,9 +30,13 @@ const parseEntry = pair => {
   return assoc('id', String(id), entry)
 }
 
-function l2watch (db, target, rev = '$', timeout = 1000) {
-  const params = targetFrom(target)
-  const key = targetToString(target) + ':log'
+/**
+ * Watch for additions
+ */
+
+function l2watch (db, topic, rev = '$', timeout = 1000) {
+  const target = targetFrom(topic)
+  const key = targetToString(topic) + ':journal'
 
   const args = [
     'BLOCK', timeout,
@@ -40,7 +44,7 @@ function l2watch (db, target, rev = '$', timeout = 1000) {
   ]
 
   const rowOf = compose(
-    merge(params),
+    merge(target),
     parseEntry
   )
 

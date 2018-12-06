@@ -10,16 +10,11 @@ import { l2commit } from '..'
  *
  */
 
-const CONFIG = {
-  // keyPrefix: 'test:',
-  // db: 1
-}
-
-const TOPIC = 'hopar:exo-nyx'
-
 /**
  * Helpers
  */
+
+const TOPIC = 'hopar:exo-nyx'
 
 const keyFor = sub =>
   `${TOPIC}:${sub}`
@@ -30,17 +25,17 @@ const Entry = (side, price, amount = 1) => [
   'amount', amount
 ]
 
-const BidEntry = (...args) =>
+const BidRow = (...args) =>
   Entry('bids', ...args)
 
-const AskEntry = (...args) =>
+const AskRow = (...args) =>
   Entry('asks', ...args)
 
 /**
  *
  */
 
-const redis = new Redis(CONFIG)
+const redis = new Redis()
 
 /**
  * Commands
@@ -54,15 +49,11 @@ async function addEntries (ctx = {}, entries) {
   //
 
   const add = members =>  {
-    const key = keyFor('log')
+    const key = keyFor('journal')
     const id = `${seed}-${++offset}`
 
-    const replyEncoding = 'utf8'
-
-    const cmd = new Command('xadd', [ key, id, ...members ], { replyEncoding })
-
     return redis
-      .sendCommand(cmd)
+      .xadd(key, id, ...members)
   }
 
   const ps = entries.map(add)
@@ -72,10 +63,10 @@ async function addEntries (ctx = {}, entries) {
 
 const tearDown = _ => {
   const SUBS = [
-    'log',
-    'rev',
-    'asks',
-    'bids'
+    'journal',
+    'data:rev',
+    'data:bids',
+    'data:asks'
   ]
 
   const ps = SUBS
@@ -91,12 +82,12 @@ test.after.always(tearDown)
 
 test.serial('import', async t => {
   const entries = [
-    BidEntry(24.5),    // 1-1
-    BidEntry(25),      // 1-2
-    AskEntry(25.5),    // 1-3
-    AskEntry(25.5, 2), // 1-4
-    BidEntry(25, 0),   // 1-5
-    AskEntry(25)       // 1-6
+    BidRow(24.5),    // 1-1
+    BidRow(25),      // 1-2
+    AskRow(25.5),    // 1-3
+    AskRow(25.5, 2), // 1-4
+    BidRow(25, 0),   // 1-5
+    AskRow(25)       // 1-6
   ]
 
   const assertRev = (expected, message) => rev =>
@@ -121,33 +112,32 @@ test.serial('import', async t => {
     .then(rev => t.is(rev, '1-6', 'internal rev as start, till end'))
 
   await redis
-    .zrangebylex(keyFor('bids'), '-', '+')
+    .zrangebylex(keyFor('data:bids'), '-', '+')
     .then(assertList([ '2450000000' ]))
 
   await redis
-    .zrangebylex(keyFor('asks'), '-', '+')
+    .zrangebylex(keyFor('data:asks'), '-', '+')
     .then(assertList([ '2500000000', '2550000000' ]))
 })
 
 test.serial('next seed', async t => {
   const entries = [
-    BidEntry(35),
-    AskEntry(35.5)
+    BidRow(35),
+    AskRow(35.5)
   ]
 
   const assertList = (expected, message) => list =>
     t.deepEqual(list, expected, message)
-
 
   const ids = await addEntries({ seed: 2 }, entries)
 
   await l2commit(redis, TOPIC)
 
   await redis
-    .zrangebylex(keyFor('bids'), '-', '+')
+    .zrangebylex(keyFor('data:bids'), '-', '+')
     .then(assertList(['3500000000'], 'reset on new seed'))
 
   await redis
-    .zrangebylex(keyFor('asks'), '-', '+')
+    .zrangebylex(keyFor('data:asks'), '-', '+')
     .then(assertList(['3550000000'], 'reset on new seed'))
 })

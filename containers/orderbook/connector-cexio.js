@@ -13,8 +13,8 @@ const Subscribe = require('./lib/subscriber-db')
 const SYMBOLS = [
   'btc-usd',
   'eth-usd',
-  'btc-eur',
-  'eth-eur'
+  // 'btc-eur',
+  // 'eth-eur'
 ]
 
 /**

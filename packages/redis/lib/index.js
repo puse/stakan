@@ -1,8 +1,6 @@
 const Redis = require('ioredis')
 
-const setupScripts = require('./scripts')
-
-const { Command } = Redis
+const scripts = require('@stakan/redis-scripts')
 
 /**
  *
@@ -12,19 +10,11 @@ class Client extends Redis {
   constructor (...args) {
     super(...args)
 
-    setupScripts(this)
-  }
+    for (let key in scripts) {
+      this.defineCommand(key, scripts[key])
+    }
 
-  xadd (...args) {
-    const cmd = new Command('xadd', args, 'utf8')
-
-    return this.sendCommand(cmd)
-  }
-
-  xread (...args) {
-    const cmd = new Command('xread', args, 'utf8')
-
-    return this.sendCommand(cmd)
+    return this
   }
 }
 
