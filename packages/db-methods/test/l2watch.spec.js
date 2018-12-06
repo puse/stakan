@@ -1,7 +1,5 @@
 import test from 'ava'
 
-import { Command } from 'ioredis'
-
 import Redis from '@stakan/redis'
 
 import { l2watch } from '..'
@@ -55,15 +53,11 @@ async function addRows (ctx = {}, rows) {
   //
 
   const add = members =>  {
-    const key = keyFor('log')
+    const key = keyFor('journal')
     const id = `${seed}-${++offset}`
 
-    const replyEncoding = 'utf8'
-
-    const cmd = new Command('xadd', [ key, id, ...members ], { replyEncoding })
-
     return redis2
-      .sendCommand(cmd)
+      .xadd(key, id, ...members)
   }
 
   const ps = rows.map(add)
@@ -73,10 +67,10 @@ async function addRows (ctx = {}, rows) {
 
 const tearDown = _ => {
   const SUBS = [
-    'log',
-    'rev',
-    'asks',
-    'bids'
+    'journal',
+    'data:rev',
+    'data:asks',
+    'data:bids'
   ]
 
   const ps = SUBS
@@ -105,7 +99,7 @@ test.serial('import', async t => {
     AskRow(25)
   ])
 
-  await l2watch(redis, TOPIC, '0')
+  await l2watch(redis, TOPIC, '1')
     .then(res => t.is(res.length, 2))
 
   await l2watch(redis, TOPIC, '1-2')

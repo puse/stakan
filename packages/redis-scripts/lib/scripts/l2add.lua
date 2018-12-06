@@ -23,8 +23,6 @@ end
 
 --
 
-local ids = {}
-
 -- take each 2 as { price, amount } pair
 
 local bids = {}
@@ -35,6 +33,8 @@ local l = #ARGV
 
 local side = nil
 
+local id = nil
+
 while i <= l do
   local x = string.lower(ARGV[i])
 
@@ -43,15 +43,13 @@ while i <= l do
     i = i + 1
   end
 
-  local id = insert {
+  id = insert {
     "side", side,
     "price", ARGV[i],
     "amount", ARGV[i + 1]
   }
 
   i = i + 2
-
-  table.insert(ids, id)
 end
 
-return ids
+return id

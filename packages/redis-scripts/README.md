@@ -13,9 +13,7 @@
 
 > L2ADD cexio:xmr-usd 1 BIDS 120 88 ASKS 121 8.2 122 50
 
-1) 1-2
-2) 1-3
-3) 1-4
+1) 1-4
 ```
 
 #### `L2COMMIT key [start] [end]`

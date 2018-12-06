@@ -4,14 +4,7 @@ import Redis from '@stakan/redis'
 
 import { l2depth } from '..'
 
-/**
- *
- */
-
-const CONFIG = {
-  // keyPrefix: 'test:',
-  // db: 1
-}
+const redis = new Redis()
 
 const TOPIC = 'hopar/exo-nyx'
 
@@ -25,21 +18,11 @@ const keyFor = sub =>
 const Entry = (price, amount = 1) =>
   [ amount, price ]
 
-/**
- *
- */
-
-const redis = new Redis(CONFIG)
-
-/**
- * Commands
- */
-
 const tearDown = _ => {
   const SUBS = [
-    'rev',
-    'asks',
-    'bids'
+    'data:rev',
+    'data:asks',
+    'data:bids'
   ]
 
   const ps = SUBS
@@ -64,9 +47,9 @@ test.serial('l2depth', async t => {
     1, 2600000000
   ]
 
-  await redis.set(keyFor('rev'), '1-4')
-  await redis.zadd(keyFor('bids'), ...bids)
-  await redis.zadd(keyFor('asks'), ...asks)
+  await redis.set(keyFor('data:rev'), '1-4')
+  await redis.zadd(keyFor('data:bids'), ...bids)
+  await redis.zadd(keyFor('data:asks'), ...asks)
 
   await l2depth(redis, TOPIC)
     .then(res => {
@@ -75,23 +58,10 @@ test.serial('l2depth', async t => {
         symbol: 'exo-nyx',
         rev: '1-4',
         rows: [
-          {
-            side: 'bids',
-            price: 24,
-            amount: 1
-          }, {
-            side: 'bids',
-            price: 24.5,
-            amount: 1
-          }, {
-            side: 'asks',
-            price: 25,
-            amount: 1
-          }, {
-            side: 'asks',
-            price: 26,
-            amount: 1
-          }
+          { side: 'bids', price: 24, amount: 1 },
+          { side: 'bids', price: 24.5, amount: 1 },
+          { side: 'asks', price: 25, amount: 1 },
+          { side: 'asks', price: 26, amount: 1 }
         ]
       }
 

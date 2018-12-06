@@ -1,5 +1,4 @@
 const {
-  tap,
   flatten,
   toPairs,
   compose,
@@ -20,26 +19,29 @@ const {
 const parseEntries = map(props(['price', 'amount']))
 
 const parseArgs = compose(
-  flatten,
-  toPairs,
-  map(parseEntries), // { bids: [[], ...], ... }
-  groupBy(prop('side')) // { bids: [{}, ...], ... }
+  flatten,               // ['bids', 500, 1.2, 499, 0.8, ... ]
+  toPairs,               // [ ['bids', [[], ...]], ...]
+  map(parseEntries),     // { bids: [[], ...], ... }
+  groupBy(prop('side'))  // { bids: [{}, ...], ... }
 )
 
-function l2add (db, data, ...rest) {
-  let session, rows
+/**
+ * Add to journal
+ *
+ * @async
+ *
+ * @param {Redis} db
+ * @param {Topic} topic
+ * @param {Number} session
+ * @param {Array} rows
+ *
+ * @return {Promise} - last inserted rev id
+ */
 
-  if (rest.length === 0) {
-    session = data.session
-    rows = data.rows
-  } else {
-    session = rest[0]
-    rows = rest[1]
-  }
+function l2add (db, topic, session, rows) {
+  const uri = targetToString(topic)
 
-  const uri = targetToString(data)
-
-  const args = parseArgs(rows || data.rows)
+  const args = parseArgs(rows)
 
   return db
     .l2add(uri, session, ...args)

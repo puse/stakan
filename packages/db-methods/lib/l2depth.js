@@ -53,12 +53,12 @@ const recover = res => {
 /**
  * Read orderbook entries
  *
- *
+ * @param {Object} topic
  */
 
-function l2depth (db, params) {
-  const target = targetFrom(params)
-  const uri = targetToString(target)
+function l2depth (db, topic) {
+  const target = targetFrom(topic)
+  const uri = targetToString(topic)
 
   return db
     .l2depth(uri)
