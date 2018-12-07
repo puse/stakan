@@ -15,6 +15,8 @@ const {
   isSnapshot
 } = require('./remote/helpers')
 
+const buffer = require('@stakan/rx-l2-buffer')
+
 /**
  * Setup
  */
@@ -79,9 +81,7 @@ function listen (symbol) {
   }
 
   return new Observable(init)
-    // .bufferTime(40)
-    // .filter(x => x.length)
-    // .map(list => list[0])
+    .pipe(buffer())
 }
 
 module.exports = listen

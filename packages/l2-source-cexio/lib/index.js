@@ -15,6 +15,8 @@ const {
   patchFor,
 } = require('./remote/helpers')
 
+const buffer = require('@stakan/rx-l2-buffer')
+
 /**
  * Helpers
  */
@@ -72,6 +74,7 @@ function Remote (symbol) {
   }
 
   return new Observable(init)
+    .pipe(buffer())
 }
 
 module.exports = Remote

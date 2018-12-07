@@ -6,9 +6,10 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava -vs"
   },
   "dependencies": {
+    "@stakan/rx-l2-buffer": "*",
     "debug": "^3.1.0",
     "generic-pool": "^3.4.2",
     "getenv": "^0.7.0",
