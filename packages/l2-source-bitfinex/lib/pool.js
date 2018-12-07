@@ -62,11 +62,24 @@ const isOpen = ws =>
  */
 
 const watch = ws => {
+  const subscriptions = {}
+
+  const subscribe = resObj => {
+    subscriptions[resObj.chanId] = resObj.channel
+  }
+
   const handleSubscriptionEvent = raw => {
     const [ chanId, data ] = raw
 
+    const channel = subscriptions[chanId]
+
+    if (typeof data === 'string') {
+      ws.emit(`origin:re:${channel}:${data}`)
+      return
+    }
+
     ws.emit(`origin:re`, chanId, data)
-    ws.emit(`origin:re:${chanId}`, data)
+    ws.emit(`origin:re:${channel}`, data)
   }
 
   // translate origin events
@@ -81,6 +94,7 @@ const watch = ws => {
     const { event } = raw
     switch (event) {
       case 'subscribed':
+        subscribe(raw)
       default:
         ws.emit(`origin:${event}`, raw)
     }

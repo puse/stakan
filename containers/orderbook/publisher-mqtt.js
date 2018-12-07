@@ -25,6 +25,9 @@ const REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379')
 
 const TARGETS = [
   {
+    broker: 'bitfinex',
+    symbol: 'btc-usd'
+  }, {
     broker: 'cexio',
     symbol: 'btc-usd'
   }, {

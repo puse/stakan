@@ -23,10 +23,13 @@ function Sink (db) {
   debug('Initialize DB subscriber')
 
   const next = patch => {
-    const commit = _ =>
-      l2commit(db, patch)
+    const commit = _ => {
+      return l2commit(db, patch)
+    }
 
     const { session, rows } = patch
+
+    console.log(patch.broker, patch.symbol, session, rows)
 
     return l2add(db, patch, session, rows)
       .then(commit)

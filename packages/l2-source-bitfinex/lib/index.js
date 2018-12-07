@@ -29,6 +29,7 @@ function listen (symbol) {
   const broker = 'bitfinex'
 
   const sync = observer => ws => {
+    let chanId = null
     let session = null
 
     const report = message => {
@@ -38,7 +39,7 @@ function listen (symbol) {
 
     const publish = raw => {
       if (isSnapshot(raw)) {
-        session = new Date()
+        session = Date.now()
       }
 
       const rows = isSnapshot(raw)
@@ -53,8 +54,8 @@ function listen (symbol) {
       })
     }
 
-    ws.on(`origin:re`, (_, data) => {
-      publish(data)
+    ws.on(`origin:re`, (x, data) => {
+      if (x === chanId) publish(data)
     })
 
     ws.on('close', _ => {
@@ -64,6 +65,10 @@ function listen (symbol) {
     })
 
     subscribe(ws, symbol)
+      .then(res => {
+        session = Date.now()
+        chanId = res.chanId
+      })
       .catch(report)
   }
 
@@ -74,6 +79,9 @@ function listen (symbol) {
   }
 
   return new Observable(init)
+    // .bufferTime(40)
+    // .filter(x => x.length)
+    // .map(list => list[0])
 }
 
 module.exports = listen
