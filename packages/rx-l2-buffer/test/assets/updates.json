@@ -1,0 +1,57 @@
+[
+  {
+    "broker": "cexio",
+    "symbol": "btc-usd",
+    "session": 1,
+    "rows": [
+      {
+        "side": "bids",
+        "price": 4999,
+        "amount": 1
+      }, {
+        "side": "bids",
+        "price": 5000,
+        "amount": 1.2
+      }, {
+        "side": "asks",
+        "price": 5002,
+        "amount": 0.8
+      }
+    ]
+  }, {
+    "broker": "cexio",
+    "symbol": "btc-usd",
+    "session": 1,
+    "rows": [
+      {
+        "side": "bids",
+        "price": 5000,
+        "amount": 0
+      }, {
+        "side": "bids",
+        "price": 4999,
+        "amount": 0.9
+      }, {
+        "side": "asks",
+        "price": 5001,
+        "amount": 0.8
+      }
+    ]
+  }, {
+    "broker": "cexio",
+    "symbol": "btc-usd",
+    "session": 1,
+    "rows": [
+      {
+        "side": "asks",
+        "price": 5000,
+        "amount": 1
+      }, {
+        "side": "asks",
+        "price": 5002,
+        "amount": 0
+      }
+    ]
+  }
+]
+
