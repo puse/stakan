@@ -12,8 +12,7 @@ import {
 } from 'ramda'
 
 /**
- *
- */
+ * */
 
 const LIMIT = 8
 
@@ -35,22 +34,17 @@ const fromSide = side => {
   return compose(limited, sorted, relevant)
 }
 
-const ordersFrom = applySpec({
-  bids: fromSide('bids'),
-  asks: fromSide('asks')
-})
-
-const topicFrom = compose(
-  join('/'),
-  props(['broker', 'symbol'])
-)
-
 /**
  * Computed
  */
 
 function topic () {
-  return topicFrom(this)
+  const from = compose(
+    join('/'),
+    props(['broker', 'symbol'])
+  )
+
+  return from(this)
 }
 
 function orders () {
@@ -58,7 +52,12 @@ function orders () {
 
   if (!snapshot$) return {}
 
-  return ordersFrom(snapshot$.rows)
+  const from = applySpec({
+    bids: fromSide('bids'),
+    asks: fromSide('asks')
+  })
+
+  return from(snapshot$.rows)
 }
 
 /**

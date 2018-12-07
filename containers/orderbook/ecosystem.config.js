@@ -36,6 +36,17 @@ const apps = [
     env_production: {
       NODE_ENV: 'production'
     }
+  }, {
+    name: 'connector-bitfinex',
+    script: './connector-bitfinex.js',
+    env: {
+      DEBUG: 'stakan:*',
+      NODE_ENV: 'development',
+      REDIS_URL: 'redis://localhost:6379'
+    },
+    env_production: {
+      NODE_ENV: 'production'
+    }
   }
 ]
 

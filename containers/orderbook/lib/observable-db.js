@@ -16,7 +16,6 @@ const isArray = is(Array)
 const extendFrom = ({ broker, symbol }) =>
   merge({ scope: 'l2s', broker, symbol })
 
-
 /**
  *
  */

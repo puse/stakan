@@ -1,10 +1,9 @@
 <template lang="pug">
   div
     header.status-bar.clearfix
-      target-select.float-left(
-        :broker="broker"
-        :symbol="symbol"
-        )
+      el-breadcrumb(separator-class="el-icon-arrow-right")
+        el-breadcrumb-item {{ broker }}
+        el-breadcrumb-item {{ symbol }}
 
       el-time.float-right(
         prefix="Updated"
@@ -35,8 +34,12 @@ h3 {
   color: #666;
 }
 
+.el-breadcrumb {
+  display: inline-block;
+}
+
 .status-bar {
-  padding: 15px;
+  padding: 15px 0;
   border-bottom: 1px solid #ddd;
 }
 </style>

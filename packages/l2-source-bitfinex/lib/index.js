@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:source:cexio')
+const debug = require('debug')('stakan:source:bitfinex')
 
 const { Observable } = require('rxjs/Rx')
 
@@ -11,15 +11,11 @@ const createPool = require('./pool')
 const { subscribe } = require('./remote')
 
 const {
-  symbolFrom,
-  patchFor,
+  rowFrom,
+  isSnapshot
 } = require('./remote/helpers')
 
 const buffer = require('@stakan/rx-l2-buffer')
-
-/**
- * Helpers
- */
 
 /**
  * Setup
@@ -31,30 +27,38 @@ const pool = createPool()
  *
  */
 
-function Remote (symbol) {
+function listen (symbol) {
+  const broker = 'bitfinex'
+
   const sync = observer => ws => {
-    const session = Date.now()
-    let offset = null
+    let chanId = null
+    let session = null
 
     const report = message => {
       const err = new Error(message)
       return observer.error(err)
     }
 
-    const publish = data => {
-      if (data.id !== offset++) return report('Bad id')
+    const publish = raw => {
+      if (isSnapshot(raw)) {
+        session = Date.now()
+      }
 
-      const payload = patchFor(symbol, session, data)
+      const rows = isSnapshot(raw)
+        ? map(rowFrom, raw)
+        : [ rowFrom(raw) ]
 
-      observer.next(payload)
+      observer.next({
+        broker,
+        symbol,
+        session,
+        rows
+      })
     }
 
-    const reset = data => {
-      offset = data.id
-      return data
-    }
-
-    ws.on('origin:md_update', publish)
+    ws.on(`origin:re`, (x, data) => {
+      if (x === chanId) publish(data)
+    })
 
     ws.on('close', _ => {
       pool
@@ -63,8 +67,11 @@ function Remote (symbol) {
     })
 
     subscribe(ws, symbol)
-      .then(reset)
-      .then(publish)
+      .then(res => {
+        session = Date.now()
+        chanId = res.chanId
+      })
+      .catch(report)
   }
 
   const init = observer => {
@@ -77,4 +84,4 @@ function Remote (symbol) {
     .pipe(buffer())
 }
 
-module.exports = Remote
+module.exports = listen

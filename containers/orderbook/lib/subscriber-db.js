@@ -23,8 +23,9 @@ function Sink (db) {
   debug('Initialize DB subscriber')
 
   const next = patch => {
-    const commit = _ =>
-      l2commit(db, patch)
+    const commit = _ => {
+      return l2commit(db, patch)
+    }
 
     const { session, rows } = patch
 

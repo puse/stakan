@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/l2-source-cexio",
+  "name": "@stakan/l2-source-bitfinex",
   "version": "0.0.1",
   "main": "lib/index.js",
   "directories": {
@@ -16,7 +16,6 @@
     "ramda": "^0.25.0",
     "rxjs": "^6.2.1",
     "rxjs-compat": "^6.2.1",
-    "ulid": "^2.3.0",
     "ws": "^5.2.1"
   },
   "devDependencies": {
