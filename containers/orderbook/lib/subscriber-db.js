@@ -29,8 +29,6 @@ function Sink (db) {
 
     const { session, rows } = patch
 
-    console.log(patch.broker, patch.symbol, session, rows)
-
     return l2add(db, patch, session, rows)
       .then(commit)
   }
