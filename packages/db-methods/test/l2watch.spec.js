@@ -62,7 +62,8 @@ async function addRows (ctx = {}, rows) {
 
   const ps = rows.map(add)
 
-  return Promise.all(ps)
+  return Promise
+    .all(ps)
 }
 
 const tearDown = _ => {
@@ -107,7 +108,9 @@ test.serial('import', async t => {
 
   const p3 = l2watch(redis, TOPIC, '1-2', 10000)
 
-  await addRows({ seed: 2 }, [ BidRow(24) ])
+  await addRows({ seed: 2 }, [ BidRow(24), AskRow(25) ])
 
   await p3.then(res => t.not(res, null))
+
+  await p3.then(console.log)
 })
