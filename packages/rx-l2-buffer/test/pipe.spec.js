@@ -10,8 +10,7 @@ const snapshot = require('./assets/snapshot')
 test('observer', async t => {
   const { index } = t.context
 
-  const update$ = Observable
-    .from(updates)
+  const update$ = Observable.from(updates)
 
   await update$
     .pipe(

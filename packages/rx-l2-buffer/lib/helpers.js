@@ -1,84 +1,31 @@
-const {
-  objOf,
-  head,
-  converge,
-  merge,
-  pick,
-  mergeDeepRight,
-  pluck,
-  assoc,
-  zipObj,
-  toPairs,
-  reduce,
-  assocPath,
-  compose,
-  juxt,
-  map,
-  unnest,
-  prop
-} = require('ramda')
+const R = require('ramda')
 
-const {
-  compact
-} = require('ramda-adjunct')
+const Depth = require('@stakan/fx-l2/lib/depth')
 
-const pack = (rows = []) => {
-  const it = (acc, row) => {
-    const { side, price, amount } = row
-    const key = [ side, String(price) ]
-    return assocPath(key, amount, acc)
-  }
-
-  return reduce(it, {}, rows)
-}
-
-const unpack = (packed = {}) => {
-  const from = side => compose(
-    assoc('side', side),
-    zipObj(['price', 'amount']),
-    map(Number)
-  )
-
-  const of = side => compose(
-    map(from(side)),
-    toPairs,
-    prop(side)
-  )
-
-  const un = compose(
-    unnest,
-    juxt([ of('bids'), of('asks') ])
-  )
-
-  return un(packed)
-}
-
-const mergeUpdates = updates => {
-  const { broker, symbol, session } = updates
-  const stamp = compose(
-    pick([
+const concat = updates => {
+  const stamp = R.compose(
+    R.pick([
       'broker',
       'symbol',
       'session'
     ]),
-    head
+    R.head
   )
 
-  const stat = compose(
-    objOf('rows'),
-    unpack,
-    reduce(mergeDeepRight, {}),
-    map(pack),
-    pluck('rows')
+  const stat = R.compose(
+    R.objOf('rows'),
+    R.sortBy(R.prop('price')),
+    R.prop('entries'),
+    R.reduce(R.concat, Depth.empty()),
+    R.map(Depth.from),
+    R.pluck('rows')
   )
 
-  const all = converge(merge, [ stat, stamp ])
+  const all = R.converge(R.merge, [ stat, stamp ])
 
   return all(updates)
 }
 
 module.exports = {
-  pack,
-  unpack,
-  mergeUpdates
+  concat
 }
