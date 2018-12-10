@@ -8,7 +8,7 @@ const {
 
 const { length } = require('ramda')
 
-const { mergeUpdates } = require('./helpers')
+const { concat } = require('./helpers')
 
 /**
  *
@@ -20,7 +20,7 @@ function buffer (timeout = 40) {
       .pipe(
         bufferTime(timeout),
         filter(length),
-        map(mergeUpdates)
+        map(concat)
       )
 }
 

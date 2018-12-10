@@ -47,4 +47,4 @@ const client = mqtt.connect(MQTT_URL)
 Observable
   .from(TARGETS)
   .flatMap(target => Source(db, target))
-  .subscribe(Sink(client))
+  .subscribe(console.log)
