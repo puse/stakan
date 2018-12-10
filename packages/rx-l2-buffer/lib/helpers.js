@@ -1,30 +1,34 @@
 const R = require('ramda')
+const RA = require('ramda-adjunct')
 
 const Depth = require('@stakan/fx-l2/lib/depth')
 
-const concat = updates => {
-  const stamp = R.compose(
-    R.pick([
-      'broker',
-      'symbol',
-      'session'
-    ]),
-    R.head
-  )
+const STAMP_PROPS = [ 'broker', 'symbol', 'session' ]
 
-  const stat = R.compose(
-    R.objOf('rows'),
-    R.sortBy(R.prop('price')),
-    R.prop('entries'),
-    R.reduce(R.concat, Depth.empty()),
-    R.map(Depth.from),
-    R.pluck('rows')
-  )
+const initialProps = R.compose(
+  R.pick(STAMP_PROPS),
+  R.head
+)
 
-  const all = R.converge(R.merge, [ stat, stamp ])
+const sortByPrice = R.sortBy(R.prop('price'))
 
-  return all(updates)
-}
+const concatRows = R.compose(
+  R.prop('entries'),
+  Depth.from,
+  RA.concatAll,
+  R.pluck('rows')
+)
+
+const aggregateRows = R.compose(
+  R.objOf('rows'),
+  sortByPrice,
+  concatRows,
+)
+
+const concat = R.converge(
+  R.merge,
+  [ aggregateRows,
+    initialProps ] )
 
 module.exports = {
   concat
