@@ -1,0 +1,28 @@
+{
+  "name": "buerse",
+  "version": "0.0.1",
+  "description": "Market constructs",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ava -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mushegha/buerse.git"
+  },
+  "keywords": [
+    "orderbook",
+    "market depth"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mushegha/buerse/issues"
+  },
+  "homepage": "https://github.com/mushegha/buerse#readme",
+  "dependencies": {
+    "ramda": "^0.26.1"
+  },
+  "devDependencies": {
+    "ava": "^1.0.1"
+  }
+}
