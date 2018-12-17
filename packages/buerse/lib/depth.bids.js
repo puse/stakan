@@ -9,7 +9,7 @@ const { cached } = require('./internal/utils')
  */
 
 class Bids extends Side {
-  constructor (entries = []) {
+  constructor (entries) {
     super(entries)
 
     // sort from highes (best) to lowest
@@ -20,7 +20,7 @@ class Bids extends Side {
       this.valueOf
     )
 
-    this.valueOf = R.thunkify (cached(get)) ()
+    this.valueOf = R.thunkify(cached(get))()
   }
 }
 

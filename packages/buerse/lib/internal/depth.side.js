@@ -21,7 +21,7 @@ class Side {
    * from
    */
 
-  static from (entries = []) {
+  static from (entries) {
     return new Side(entries)
   }
 
@@ -30,13 +30,13 @@ class Side {
    */
 
   static empty () {
-    return new Side
+    return new Side()
   }
 
   constructor (entries = []) {
     const get = xs => [...new Map(xs)] // eliminate duplicates
 
-    this.valueOf = R.thunkify (cached(get)) (entries)
+    this.valueOf = R.thunkify(cached(get))(entries)
   }
 
   /**
@@ -87,7 +87,7 @@ class Side {
     return this.valueOf()
   }
 
-  [Symbol.iterator]() {
+  [Symbol.iterator] () {
     const entries = this.valueOf()
     let i = 0
     return {
@@ -99,7 +99,6 @@ class Side {
       }
     }
   }
-
 }
 
 module.exports = Side

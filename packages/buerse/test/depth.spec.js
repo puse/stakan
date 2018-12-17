@@ -1,20 +1,12 @@
 import test from 'ava'
 
-import * as R from 'ramda'
+import Depth from '../lib/depth'
 
-import Side from '../lib/internal/depth.side'
-import Depth, { Bids, Asks } from '../lib/depth'
+test('constructor', t => {
+  t.is(typeof Depth, 'function')
 
-const xs = [
-  [ 50, 1 ],
-  [ 70, 1 ],
-  [ 60, 1 ]
-]
+  const depth = new Depth()
 
-const xsNext = [
-  [ 70, 2 ],
-  [ 75, 3 ],
-  [ 50, 0 ]
-]
-
-test.todo('constructor')
+  t.not(depth.bids, undefined)
+  t.not(depth.asks, undefined)
+})

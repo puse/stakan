@@ -72,7 +72,6 @@ test('from', t => {
   )
 })
 
-
 // fl specs
 
 // Setoid
@@ -97,10 +96,12 @@ test('concat', t => {
   t.true(
     R.equals(
       side.concat(bidsNext),
-      Side.from([ [50, 0],
-                  [70, 2],
-                  [60, 1],
-                  [75, 3] ])
+      Side.from(
+        [ [50, 0],
+          [70, 2],
+          [60, 1],
+          [75, 3] ]
+      )
     ),
     'value'
   )
@@ -144,8 +145,8 @@ test('empty', t => {
 test('map', t => {
   const side = Side.from(xs)
 
-  const f = ([p, q]) => [p+1, q]
-  const g = ([p, q]) => [p, q*2]
+  const f = ([p, q]) => [p + 1, q]
+  const g = ([p, q]) => [p, q * 2]
 
   t.true(
     R.equals(
@@ -202,12 +203,13 @@ test('filter', t => {
   t.true(
     R.equals(
       side.filter(p),
-      Side.from([ [70, 1],
-                  [60, 1] ])
+      Side.from(
+        [ [70, 1],
+          [60, 1] ]
+      )
     ),
     'value'
   )
-
 })
 
 // Foldable
