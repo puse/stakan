@@ -17,32 +17,4 @@ const xsNext = [
   [ 50, 0 ]
 ]
 
-test('Bids', t => {
-  const bids = new Bids(xs)
-
-  t.true(bids instanceof Bids, 'type')
-  t.true(bids instanceof Side, 'type')
-
-  t.deepEqual(
-    bids.valueOf(),
-    [ [ 70, 1 ],
-      [ 60, 1 ],
-      [ 50, 1 ] ],
-    'sorted descending'
-  )
-})
-
-test('Asks', t => {
-  const asks = new Asks(xs)
-
-  t.true(asks instanceof Asks, 'type')
-  t.true(asks instanceof Side, 'type')
-
-  t.deepEqual(
-    asks.valueOf(),
-    [ [ 50, 1 ],
-      [ 60, 1 ],
-      [ 70, 1 ] ],
-    'sorted ascending'
-  )
-})
+test.todo('constructor')
