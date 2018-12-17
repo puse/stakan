@@ -4,56 +4,50 @@ const R = require('ramda')
  * Memoize
  *
  * cached :: (a -> b) -> a -> b
- * 
+ *
  */
 
 const cached = R.memoizeWith(R.identity)
 
 /**
- * Bids collection
+ * Side collection
  *
- * Bids :: [Order] -> Bids
+ * Side :: [Order] -> Side
  */
 
-class Bids {
+class Side {
   /**
-   * of 
+   * of
    */
 
   static of (entry) {
-    return new Bids([ entry ])
+    return new Side([ entry ])
   }
 
   /**
-   * from 
+   * from
    */
 
   static from (entries = []) {
-    return new Bids(entries)
+    return new Side(entries)
   }
 
   /**
-   * empty :: Bids m => () -> m
+   * empty :: Side m => () -> m
    */
 
   static empty () {
-    return new Bids
+    return new Side
   }
 
   constructor (entries = []) {
-    // sort from highes (best) to lowest
-    const byPrice = R.descend(R.prop(0))
-
-    const get = R.compose(
-      R.sort(byPrice), 
-      xs => [...new Map(xs)] // eliminate duplicate keys
-    )
+    const get = xs => [...new Map(xs)] // eliminate duplicates
 
     this.valueOf = R.thunkify (cached(get)) (entries)
   }
 
   /**
-   * equals :: Bids a => a ~> a -> Boolean
+   * equals :: Side a => a ~> a -> Boolean
    */
 
   equals (that) {
@@ -61,29 +55,29 @@ class Bids {
   }
 
   /**
-   * concat :: Bids a => a ~> a -> a
+   * concat :: Side a => a ~> a -> a
    */
 
   concat (that) {
-    return Bids.from([...this, ...that])
+    return Side.from([...this, ...that])
   }
 
   /**
-   * map :: Bids f => f a ~> (a -> b) -> f b
+   * map :: Side f => f a ~> (a -> b) -> f b
    */
 
   map (fn) {
     const entries = R.map(fn, [...this])
-    return Bids.from(entries)
+    return Side.from(entries)
   }
 
   /**
-   * filter :: Bids f => f a ~> (a -> Boolean) -> f a
+   * filter :: Side f => f a ~> (a -> Boolean) -> f a
    */
 
   filter (pred) {
     const entries = R.filter(pred, [...this])
-    return Bids.from(entries)
+    return Side.from(entries)
   }
 
   /**
@@ -115,4 +109,4 @@ class Bids {
 
 }
 
-module.exports = Bids
+module.exports = Side
