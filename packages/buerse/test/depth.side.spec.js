@@ -20,10 +20,18 @@ test('constructor', t => {
 
   t.true(side instanceof Side, 'type')
 
+  t.is(new Side(side), side, 'self')
+
   t.deepEqual(
     side.toArray(),
     side.valueOf(),
     'api'
+  )
+
+  t.deepEqual(
+    new Side().valueOf(),
+    new Side([]).valueOf(),
+    'default arguments'
   )
 
   t.deepEqual(
@@ -241,6 +249,12 @@ test('Asks', t => {
   t.true(asks instanceof Asks, 'type')
   t.true(asks instanceof Side, 'type')
 
+  t.true(Asks.from(xs) instanceof Asks, 'type')
+  t.true(Asks.of(xs[0]) instanceof Asks, 'type')
+  t.true(Asks.empty() instanceof Asks, 'type')
+
+  t.is(Asks.from(asks), asks, 'self')
+
   t.deepEqual(
     asks.valueOf(),
     [ [ 50, 1 ],
@@ -255,6 +269,12 @@ test('Bids', t => {
 
   t.true(bids instanceof Bids, 'type')
   t.true(bids instanceof Side, 'type')
+
+  t.true(Bids.from(xs) instanceof Bids, 'type')
+  t.true(Bids.of(xs[0]) instanceof Bids, 'type')
+  t.true(Bids.empty() instanceof Bids, 'type')
+
+  t.is(Bids.from(bids), bids, 'self')
 
   t.deepEqual(
     bids.valueOf(),

@@ -10,19 +10,20 @@ const { cached } = require('./utils')
 
 class Side {
   /**
-   * of
-   */
-
-  static of (entry) {
-    return new Side([ entry ])
-  }
-
-  /**
    * from
    */
 
   static from (entries) {
-    return new Side(entries)
+    const Constructor = this
+    return new Constructor(entries)
+  }
+
+  /**
+   * of
+   */
+
+  static of (entry) {
+    return this.from([ entry ])
   }
 
   /**
@@ -30,10 +31,16 @@ class Side {
    */
 
   static empty () {
-    return new Side()
+    return this.from([])
   }
 
+  /**
+   * Constructor
+   */
+
   constructor (entries = []) {
+    if (entries instanceof this.constructor) return entries
+
     const get = xs => [...new Map(xs)] // eliminate duplicates
 
     this.valueOf = R.thunkify(cached(get))(entries)
