@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import U from '../../lib/internal/utils'
+import U from '../lib/utils'
 
 test('cached', t => {
   // `incr` once for each + 5 `t.is`
