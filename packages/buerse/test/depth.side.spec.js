@@ -96,14 +96,14 @@ test('equals', t => {
 // Semigroup
 test('concat', t => {
   const side = Side.from(xs)
-  const bidsNext = Side.from(xsNext)
-  const bidsExt = Side.of([ 80, 4 ])
+  const sideNext = Side.from(xsNext)
+  const sideExt = Side.of([ 80, 4 ])
 
-  t.true(side.concat(bidsNext) instanceof Side, 'type')
+  t.true(side.concat(sideNext) instanceof Side, 'type')
 
   t.true(
     R.equals(
-      side.concat(bidsNext),
+      side.concat(sideNext),
       Side.from(
         [ [50, 0],
           [70, 2],
@@ -116,8 +116,8 @@ test('concat', t => {
 
   t.true(
     R.equals(
-      side.concat(bidsNext).concat(bidsExt),
-      side.concat(bidsNext.concat(bidsExt))
+      side.concat(sideNext).concat(sideExt),
+      side.concat(sideNext.concat(sideExt))
     ),
     'associativity'
   )
