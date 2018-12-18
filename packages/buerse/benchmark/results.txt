@@ -1,0 +1,6 @@
+Depth#valueOf
+  depth x 8,319 ops/sec ±1.50% (75 runs sampled)
+  raw x 830,184 ops/sec ±10.99% (71 runs sampled)
+Depth#concat
+  depth x 3,851 ops/sec ±0.89% (75 runs sampled)
+  raw x 165,636 ops/sec ±18.23% (76 runs sampled)
