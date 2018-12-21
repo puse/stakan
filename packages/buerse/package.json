@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/mushegha/buerse#readme",
   "dependencies": {
+    "daggy": "^1.3.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
