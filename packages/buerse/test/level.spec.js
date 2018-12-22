@@ -1,22 +1,18 @@
-/* eslint-disable */
-
 import test from 'ava'
 
-// import * as R from 'ramda'
 import { Bid, Ask, Nil } from '../lib/level'
 
-// const bid40 = [40, 2]
-// const ask45 = [45, 2.5]
+// Helpers
 
-// const isLevel = that => that instanceof Level
+const equals = (a, b) => String(a) === String(b)
+
+// Tests
 
 test('constructor', t => {
   // Behavior
-
-  // t.deepEqual(
-  //   Bid(40, 2),
-  //   { price: 40, quantity: 2 }
-  // )
+  t.true(Bid.is(Bid(40, 2)), 'type')
+  t.true(Ask.is(Ask(40, 2)), 'type')
+  t.true(Nil.is(Nil(40)), 'type')
 
   // Sanity
   t.throws(() => Bid(40), TypeError, 'arguments')
@@ -24,24 +20,31 @@ test('constructor', t => {
   t.throws(() => Nil(40, 2), TypeError, 'arguments')
 })
 
-test.todo('of')
-test.todo('from')
-
 // fl specs
-
-
 
 // Setoid
 test('equals', t => {
-  // Laws
-
   const a = Bid(40, 2)
   const b = Bid(40, 2)
   const c = Bid(40, 2)
 
+  const o = Nil(42)
+
+  const x = Ask(40, 2)
+
+  // Laws
+
   t.true(a.equals(a), 'reflexivity')
   t.is(a.equals(b), b.equals(a), 'symmetry')
   t.is(a.equals(b) && b.equals(c), a.equals(c), 'transitivity')
+
+  // Sanity
+
+  t.throws(() => a.equals(x), TypeError, 'Bid === Ask')
+  t.throws(() => x.equals(a), TypeError, 'Ask === Bid')
+
+  t.throws(() => a.equals(o), TypeError, 'Bid === Nil')
+  t.throws(() => o.equals(a), TypeError, 'Nil === Bid')
 
   // Behavior
 
@@ -55,11 +58,6 @@ test('equals', t => {
     'Bid(40, 2) == Bid(40, 3)'
   )
 
-  t.true(
-    Bid(40, 2).equals(Ask(40, 2)),
-    'Bid(40, 2) == Ask(42, 2)'
-  )
-
   t.false(
     Bid(40, 2).equals(Bid(42, 2)),
     'Bid(40, 2) != Bid(42, 2)'
@@ -67,215 +65,53 @@ test('equals', t => {
 })
 
 // Ord
-test('lte,gt', t => {
-  // Laws
-
+test('lte, lt, gte, gt', t => {
   const a = Bid(40, 2)
   const b = Bid(42, 2)
   const c = Bid(42, 2)
+
+  const o = Nil(42)
+
+  const x = Ask(40, 2)
+  const y = Ask(42, 2)
+
+  // Laws
 
   t.true(a.lte(b) || b.lte(a), 'totality')
   t.is(a.lte(b) && b.lte(a), a.equals(b), 'antisymmetry')
   t.is(b.lte(c) && c.lte(b), b.equals(c), 'antisymmetry')
   t.is(a.lte(b) && b.lte(c), a.lte(c), 'transitivity')
 
-  // Behavior
-  t.true(a.lte(a), 'Bid(40, 2) <= Bid(40, 2)')
-  t.true(a.lte(b), 'Bid(40, 2) <= Bid(42, 2)')
-  t.false(b.lte(a), 'Bid(42, 2) <= Bid(40, 2)')
-  t.false(a.gt(a), 'Bid(40, 2) > Bid(40, 2)')
-  t.false(a.gt(b), 'Bid(40, 2) > Bid(42, 2)')
-  t.true(b.gt(a), 'Bid(42, 2) > Bid(40, 2)')
-})
+  // Sanity
 
-// // Semigroup
-// test('concat', t => {
-//   const side = Side.from(40, 2)
-//   const sideNext = Side.from(xsNext)
-//   const sideExt = Side.of([ 80, 4 ])
-//
-//   t.true(side.concat(sideNext) instanceof Side, 'type')
-//
-//   t.true(
-//     R.equals(
-//       side.concat(sideNext),
-//       Side.from(
-//         [ [50, 0],
-//           [70, 2],
-//           [60, 1],
-//           [75, 3] ]
-//       )
-//     ),
-//     'value'
-//   )
-//
-//   t.true(
-//     R.equals(
-//       side.concat(sideNext).concat(sideExt),
-//       side.concat(sideNext.concat(sideExt))
-//     ),
-//     'associativity'
-//   )
-// })
-//
-// // Monoid
-// test('empty', t => {
-//   const side = Side.from(xs)
-//   const empty = Side.empty()
-//
-//   t.true(empty instanceof Side, 'type')
-//
-//   t.true(R.equals(empty, Side.from([])), 'value')
-//
-//   t.true(
-//     R.equals(
-//       side.concat(empty),
-//       side
-//     ),
-//     'right identity'
-//   )
-//
-//   t.true(
-//     R.equals(
-//       empty.concat(side),
-//       side
-//     ),
-//     'left identity'
-//   )
-// })
-//
-// // Functor
-// test('map', t => {
-//   const side = Side.from(xs)
-//
-//   const f = ([p, q]) => [p + 1, q]
-//   const g = ([p, q]) => [p, q * 2]
-//
-//   t.true(
-//     R.equals(
-//       side.map(R.identity),
-//       side
-//     ),
-//     'identity'
-//   )
-//
-//   t.true(
-//     R.equals(
-//       side.map(f).map(g),
-//       side.map(R.compose(f, g))
-//     ),
-//     'composition'
-//   )
-// })
-//
-// // Filterable
-// test('filter', t => {
-//   const side = Side.from(xs)
-//
-//   const p = R.propSatisfies(R.lt(50), 0)
-//   const q = R.propSatisfies(R.gt(70), 0)
-//
-//   t.true(side.filter(p) instanceof Side, 'type')
-//
-//   t.true(
-//     R.equals(
-//       side.filter(R.both(p, q)),
-//       side.filter(p).filter(q)
-//     ),
-//     'distributivity'
-//   )
-//
-//   t.true(
-//     R.equals(
-//       side.filter(R.T),
-//       side
-//     ),
-//     'identity'
-//   )
-//
-//   t.true(
-//     R.equals(
-//       side.filter(R.F),
-//       Side.from(xsNext).filter(R.F)
-//     ),
-//     'annihilation'
-//   )
-//
-//   //
-//
-//   t.true(
-//     R.equals(
-//       side.filter(p),
-//       Side.from(
-//         [ [70, 1],
-//           [60, 1] ]
-//       )
-//     ),
-//     'value'
-//   )
-// })
-//
-// // Foldable
-// test('reduce', t => {
-//   const side = Side.from(xs)
-//
-//   const concater = (y, x) => y.concat(Side.of(x))
-//
-//   t.true(
-//     R.equals(
-//       side.reduce(concater, Side.empty()),
-//       side
-//     ),
-//     'identity'
-//   )
-//
-//   //
-//
-//   t.is(
-//     side.reduce((y, x) => y + x[1], 0),
-//     3,
-//     'value'
-//   )
-// })
-//
-// test('Asks', t => {
-//   const asks = new Asks(xs)
-//
-//   t.true(asks instanceof Asks, 'type')
-//   t.true(asks instanceof Side, 'type')
-//
-//   t.true(Asks.from(xs) instanceof Asks, 'type')
-//   t.true(Asks.of(xs[0]) instanceof Asks, 'type')
-//   t.true(Asks.empty() instanceof Asks, 'type')
-//
-//   t.is(Asks.from(asks), asks, 'self')
-//
-//   t.deepEqual(
-//     asks.valueOf(),
-//     [ [ 50, 1 ],
-//       [ 60, 1 ],
-//       [ 70, 1 ] ],
-//     'sorted ascending'
-//   )
-// })
-//
-// test('Bids', t => {
-//   const bids = new Bids(xs)
-//
-//   t.true(bids instanceof Bids, 'type')
-//   t.true(bids instanceof Side, 'type')
-//
-//   t.true(Bids.from(xs) instanceof Bids, 'type')
-//   t.true(Bids.of(xs[0]) instanceof Bids, 'type')
-//   t.true(Bids.empty() instanceof Bids, 'type')
-//
-//   t.is(Bids.from(bids), bids, 'self')
-//
-//   t.deepEqual(
-//     bids.valueOf(),
-//     [ [ 70, 1 ],
-//       [ 60, 1 ],
-//       [ 50, 1 ] ],
-//     'sorted descending'
-//   )
-// })
+  t.throws(() => a.lte(x), TypeError, 'Bid <= Ask')
+  t.throws(() => x.lte(a), TypeError, 'Ask <= Bid')
+
+  t.throws(() => a.lte(o), TypeError, 'compare w/ Nil')
+  t.throws(() => o.lte(a), TypeError, 'compare w/ Nil')
+  t.throws(() => o.lte(o), TypeError, 'compare w/ Nil')
+
+  // Behavior
+
+  t.true(a.lte(a), 'Bid(40, 2) <= Bid(40, 2)')
+  t.false(a.lte(b), 'Bid(40, 2) <= Bid(42, 2)')
+  t.true(b.lte(a), 'Bid(42, 2) <= Bid(40, 2)')
+
+  t.true(x.lte(x), 'Ask(40, 2) <= Ask(40, 2)')
+  t.true(x.lte(y), 'Ask(40, 2) <= Ask(42, 2)')
+  t.false(y.lte(x), 'Ask(42, 2) <= Ask(40, 2)')
+
+  // Extended behavior
+
+  t.false(x.lt(x), 'Ask(40, 2) < Ask(40, 2)')
+  t.true(x.lt(y), 'Ask(40, 2) < Ask(42, 2)')
+  t.false(y.lt(x), 'Ask(42, 2) < Ask(40, 2)')
+
+  t.true(x.gte(x), 'Ask(40, 2) => Ask(40, 2)')
+  t.false(x.gte(y), 'Ask(40, 2) => Ask(42, 2)')
+  t.true(y.gte(x), 'Ask(42, 2) => Ask(40, 2)')
+
+  t.false(x.gt(x), 'Ask(40, 2) > Ask(40, 2)')
+  t.false(x.gt(y), 'Ask(40, 2) > Ask(42, 2)')
+  t.true(y.gt(x), 'Ask(42, 2) > Ask(40, 2)')
+})

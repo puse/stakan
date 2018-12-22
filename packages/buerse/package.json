@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint lib/** test/**",
     "test": "nyc ava -v",
-    "benchmark": "node benchmark/*.js"
+    "benchmark": "node bench/*.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   "homepage": "https://github.com/mushegha/buerse#readme",
   "dependencies": {
     "daggy": "^1.3.0",
+    "fantasy-land": "^3.5.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {
