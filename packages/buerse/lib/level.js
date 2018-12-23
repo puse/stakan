@@ -1,6 +1,20 @@
 const daggy = require('daggy')
 
 /**
+ * Helpers
+ */
+
+const assertSameTags = (a, b) => {
+  const tagA = a['@@tag']
+  const tagB = b['@@tag']
+
+  if (tagA !== tagB) {
+    const message = `Can't compare ${tagA} to ${tagB}`
+    throw new TypeError(message)
+  }
+}
+
+/**
  * type Level p q
  *   = Nil p
  *   | Bid p q
@@ -14,32 +28,15 @@ const Level = daggy.taggedSum('Level', {
 })
 
 /**
- * equals :: Level a => a ~> a -> Boolean
+ * equals :: Bid a => a ~> a -> Boolean
+ * equals :: Ask a => a ~> a -> Boolean
+ * equals :: Nil a => a ~> a -> Boolean
  */
 
 Level.prototype.equals = function (that) {
-  const throws = () => {
-    const message = `Can't compare ${this} with ${that}`
-    throw new TypeError(message)
-  }
+  assertSameTags(this, that)
 
-  return this.cata({
-    Bid: (a) => that.cata({
-      Bid: (b) => a === b,
-      Ask: throws,
-      Nil: throws
-    }),
-    Ask: (a) => that.cata({
-      Bid: throws,
-      Ask: (b) => a === b,
-      Nil: throws
-    }),
-    Nil: (a) => that.cata({
-      Bid: throws,
-      Ask: throws,
-      Nil: (b) => a === b
-    })
-  })
+  return this.price === that.price
 }
 
 /**
@@ -66,7 +63,8 @@ Level.prototype.lte = function (that) {
 }
 
 /**
- * lt :: Level a => a ~> a -> Boolean
+ * lt :: Bid a => a ~> a -> Boolean
+ * lt :: Ask a => a ~> a -> Boolean
  */
 
 Level.prototype.lt = function (that) {
@@ -74,7 +72,8 @@ Level.prototype.lt = function (that) {
 }
 
 /**
- * gte :: Level a => a ~> a -> Boolean
+ * gte :: Bid a => a ~> a -> Boolean
+ * gte :: Ask a => a ~> a -> Boolean
  */
 
 Level.prototype.gte = function (that) {
@@ -82,7 +81,8 @@ Level.prototype.gte = function (that) {
 }
 
 /**
- * gt :: Level a => a ~> a -> Boolean
+ * gt :: Bid a => a ~> a -> Boolean
+ * gt :: Ask a => a ~> a -> Boolean
  */
 
 Level.prototype.gt = function (that) {

@@ -40,6 +40,9 @@ test('equals', t => {
 
   // Sanity
 
+  t.true(o.equals(o))
+  t.true(x.equals(x))
+
   t.throws(() => a.equals(x), TypeError, 'Bid === Ask')
   t.throws(() => x.equals(a), TypeError, 'Ask === Bid')
 
