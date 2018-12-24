@@ -5,6 +5,7 @@
     "containers/http-server",
     "containers/mqtt-producer",
     "containers/remote-connector-cexio",
+    "containers/remote-connector-bitfinex",
     "containers/orderbook"
   ],
   "version": "independent"

@@ -47,3 +47,13 @@ services:
       - REDIS_URL=redis://redis:6379
       - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
       - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
+
+  remote-connector-cexio:
+    build: ./containers/remote-connector-cexio
+    links:
+      - redis
+    environment:
+      - ENV=production
+      - REDIS_URL=redis://redis:6379
+      - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
+      - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
