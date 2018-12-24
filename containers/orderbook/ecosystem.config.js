@@ -1,17 +1,5 @@
 const apps = [
   {
-    name: 'server-api',
-    script: './server-api.js',
-    env: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'development',
-      NODE_PORT: 8080,
-      REDIS_URL: 'redis://localhost:6379'
-    },
-    env_production: {
-      NODE_ENV: 'production'
-    }
-  }, {
     name: 'publisher-mqtt',
     script: './publisher-mqtt.js',
     env: {

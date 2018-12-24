@@ -1,14 +1,10 @@
 const debug = require('debug')('stakan:http')
 
-const Koa = require('koa')
-
 const getenv = require('getenv')
-
-const logger = require('koa-logger')
 
 const Redis = require('@stakan/redis')
 
-const router = require('./lib/router')
+const createApp = require('./lib')
 
 /**
  * Settings
@@ -22,14 +18,10 @@ const REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379')
  * Server setup
  */
 
-const app = new Koa()
+const redis = new Redis(REDIS_URL)
 
-app.context.redis = new Redis(REDIS_URL)
-
-app.use(logger())
-
-app.use(router())
+const app = createApp(redis)
 
 app.listen(PORT, _ => {
-  debug('Server is listening to %d', PORT)
+  console.log('Server is listening to %d', PORT)
 })
