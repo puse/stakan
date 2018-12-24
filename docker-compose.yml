@@ -5,7 +5,7 @@ services:
   # Services
 
   redis:
-    build: ./containers/redis/
+    build: ./containers/redis
     ports:
       - "6379:6379"
 
@@ -15,7 +15,15 @@ services:
       - "1883:1883"
       - "9001:9001"
 
-  # verdaccio:
-  #   image: verdaccio/verdaccio
-  #   ports:
-  #     - "4873:4873"
+  #
+
+  http-server:
+    build: ./containers/http-server
+    links:
+      - redis
+    environment:
+      - ENV=production
+      - REDIS_URL=redis://redis:6379
+      - NODE_PORT=80
+    ports:
+      - "8080:80"
