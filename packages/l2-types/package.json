@@ -1,26 +1,19 @@
 {
-  "name": "buerse",
+  "name": "l2-types",
   "version": "0.0.1",
   "description": "Market constructs",
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint lib/** test/**",
-    "test": "nyc ava -v",
+    "test": "ava -v",
     "benchmark": "node bench/*.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mushegha/buerse.git"
-  },
   "keywords": [
+    "stakan",
     "orderbook",
     "market depth"
   ],
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mushegha/buerse/issues"
-  },
-  "homepage": "https://github.com/mushegha/buerse#readme",
   "dependencies": {
     "daggy": "^1.3.0",
     "fantasy-land": "^3.5.0",
@@ -36,14 +29,6 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "microtime": "^2.1.8",
-    "nyc": "^13.1.0"
-  },
-  "nyc": {
-    "reporter": [
-      "html",
-      "lcov",
-      "text"
-    ]
+    "microtime": "^2.1.8"
   }
 }
