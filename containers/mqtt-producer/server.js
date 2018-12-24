@@ -23,6 +23,8 @@ const MQTT_URL = getenv('MQTT_URL', 'mqtt://localhost:1883')
 
 const REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379')
 
+// TODO: parametrize somehow
+
 const TARGETS = [
   {
     broker: 'bitfinex',

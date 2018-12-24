@@ -27,3 +27,13 @@ services:
       - NODE_PORT=80
     ports:
       - "8080:80"
+
+  mqtt-producer:
+    build: ./containers/mqtt-producer
+    links:
+      - redis
+      - mosquitto
+    environment:
+      - ENV=production
+      - REDIS_URL=redis://redis:6379
+      - MQTT_URL=mqtt://mosquitto:1883

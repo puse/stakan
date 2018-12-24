@@ -1,17 +1,5 @@
 const apps = [
   {
-    name: 'publisher-mqtt',
-    script: './publisher-mqtt.js',
-    env: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'development',
-      MQTT_URL: 'mqtt://localhost:1883',
-      REDIS_URL: 'redis://localhost:6379'
-    },
-    env_production: {
-      NODE_ENV: 'production'
-    }
-  }, {
     name: 'connector-cexio',
     script: './connector-cexio.js',
     env: {
@@ -24,17 +12,17 @@ const apps = [
     env_production: {
       NODE_ENV: 'production'
     }
-  }, {
-    name: 'connector-bitfinex',
-    script: './connector-bitfinex.js',
-    env: {
-      DEBUG: 'stakan:*',
-      NODE_ENV: 'development',
-      REDIS_URL: 'redis://localhost:6379'
-    },
-    env_production: {
-      NODE_ENV: 'production'
-    }
+  // }, {
+  //   name: 'connector-bitfinex',
+  //   script: './connector-bitfinex.js',
+  //   env: {
+  //     DEBUG: 'stakan:*',
+  //     NODE_ENV: 'development',
+  //     REDIS_URL: 'redis://localhost:6379'
+  //   },
+  //   env_production: {
+  //     NODE_ENV: 'production'
+  //   }
   }
 ]
 

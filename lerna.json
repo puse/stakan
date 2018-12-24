@@ -3,6 +3,7 @@
     "packages/*",
     "containers/web-client",
     "containers/http-server",
+    "containers/mqtt-producer",
     "containers/orderbook"
   ],
   "version": "independent"
