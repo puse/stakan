@@ -11,7 +11,7 @@ function read () {
 }
 
 function main () {
-  const router = new Router()
+  const router = new Router({ prefix: '/l2' })
 
   router.get('/:broker/:symbol', read())
 
