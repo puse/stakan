@@ -9,7 +9,6 @@
   "dependencies": {
     "@stakan/redis": "*",
     "@stakan/db-methods": "*",
-    "@stakan/mqtt-methods": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
     "mqtt": "^2.18.8",

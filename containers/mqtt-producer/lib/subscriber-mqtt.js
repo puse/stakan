@@ -1,8 +1,8 @@
-const debug = require('debug')('stakan:l2:mqtt')
+const debug = require('debug')('stakan:producer:mqtt')
 
 const { Subscriber } = require('rxjs/Rx')
 
-const { publish } = require('@stakan/mqtt-methods')
+const { publish } = require('./mqtt-methods')
 
 /**
  * Helpers
