@@ -1,29 +1,21 @@
+const getenv = require('getenv')
+
 const { Observable } = require('rxjs/Rx')
 
 const Redis = require('@stakan/redis')
 
 const Source = require('@stakan/l2-source-cexio')
 
-const Subscribe = require('./lib/subscriber-db')
+const {
+  l2add,
+  l2commit
+} = require('@stakan/db-methods')
 
 /**
  * Settings
  */
 
-const SYMBOLS = [
-  'btc-usd',
-  'eth-usd',
-  // 'btc-eur',
-  // 'eth-eur'
-]
-
-/**
- *
- */
-
-const fromSymbol = symbol =>
-  Source(symbol)
-    .retry(Infinity)
+const SYMBOL = getenv('SYMBOL')
 
 /**
  * Init
@@ -31,11 +23,24 @@ const fromSymbol = symbol =>
 
 const db = new Redis()
 
+const consume = patch => {
+  const { session, rows } = patch
+
+  const add = _ => {
+    return l2add(db, patch, session, rows)
+  }
+
+  const commit = _ => {
+    return l2commit(db, patch)
+  }
+
+  return add().then(commit)
+}
+
 /**
  *
  */
 
-Observable
-  .from(SYMBOLS)
-  .flatMap(fromSymbol)
-  .subscribe(Subscribe(db))
+Source(SYMBOL)
+  .retry(Infinity)
+  .subscribe(consume)

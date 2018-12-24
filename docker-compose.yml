@@ -38,7 +38,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - MQTT_URL=mqtt://mosquitto:1883
 
-  remote-connector-cexio:
+  remote-connector-cexio-btc-usd:
     build: ./containers/remote-connector-cexio
     links:
       - redis
@@ -47,8 +47,9 @@ services:
       - REDIS_URL=redis://redis:6379
       - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
       - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
+      - SYMBOl=btc-usd
 
-  remote-connector-cexio:
+  remote-connector-cexio-eth-usd:
     build: ./containers/remote-connector-cexio
     links:
       - redis
@@ -57,3 +58,4 @@ services:
       - REDIS_URL=redis://redis:6379
       - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
       - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
+      - SYMBOL=eth-usd
