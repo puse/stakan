@@ -59,3 +59,22 @@ services:
       - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
       - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
       - SYMBOL=eth-usd
+
+  remote-connector-bitfinex-btc-usd:
+    build: ./containers/remote-connector-bitfinex
+    links:
+      - redis
+    environment:
+      - ENV=production
+      - REDIS_URL=redis://redis:6379
+      - SYMBOl=btc-usd
+
+  remote-connector-bitfinex-eth-usd:
+    build: ./containers/remote-connector-bitfinex
+    links:
+      - redis
+    environment:
+      - ENV=production
+      - REDIS_URL=redis://redis:6379
+      - SYMBOl=eth-usd
+

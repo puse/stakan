@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:source:bitfinex')
+const debug = require('debug')('stakan:connector:bitfinex')
 
 const { whereEq } = require('ramda')
 
