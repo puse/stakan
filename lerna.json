@@ -4,6 +4,7 @@
     "containers/web-client",
     "containers/http-server",
     "containers/mqtt-producer",
+    "containers/remote-connector-cexio",
     "containers/orderbook"
   ],
   "version": "independent"
