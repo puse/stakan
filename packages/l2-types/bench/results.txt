@@ -1,0 +1,6 @@
+Batch#concat
+  depth x 483,089 ops/sec ±1.28% (83 runs sampled)
+  ramda x 2,011,165 ops/sec ±1.31% (83 runs sampled)
+Batch#toArray
+  batch x 67,642 ops/sec ±1.11% (86 runs sampled)
+  ramda x 43,386 ops/sec ±1.56% (83 runs sampled)

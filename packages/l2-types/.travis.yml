@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - '10'
+notifications:
+  email: false
+script:
+  - npm run test
+after_success:
+  - npx codecov --file=./coverage/lcov.info
