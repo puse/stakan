@@ -4,12 +4,12 @@ const { Observable } = require('rxjs/Rx')
 
 const Redis = require('@stakan/redis')
 
-const Source = require('@stakan/l2-source-cexio')
-
 const {
   l2add,
   l2commit
 } = require('@stakan/db-methods')
+
+const Source = require('./lib')
 
 /**
  * Settings

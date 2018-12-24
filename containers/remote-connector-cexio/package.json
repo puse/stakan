@@ -1,18 +1,24 @@
 {
   "name": "@stakan/remote-connector-cexio",
   "version": "0.0.1",
-  "private": true,
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava -v",
     "start": "node server.js"
   },
   "dependencies": {
-    "@stakan/redis": "*",
     "@stakan/db-methods": "*",
-    "@stakan/l2-source-cexio": "*",
+    "@stakan/redis": "*",
+    "@stakan/rx-l2-buffer": "*",
     "debug": "^4.1.1",
+    "generic-pool": "^3.4.2",
     "getenv": "^0.7.0",
     "rxjs": "^6.3.3",
-    "rxjs-compat": "^6.3.3"
+    "rxjs-compat": "^6.3.3",
+    "ulid": "^2.3.0",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "ava": "^1.0.1"
   }
 }

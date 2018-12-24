@@ -1,10 +1,8 @@
-const debug = require('debug')('stakan:source:cexio')
+const debug = require('debug')('stakan:connector:cexio')
 
 const { Observable } = require('rxjs/Rx')
 
-const {
-  map
-} = require('ramda')
+const { map } = require('ramda')
 
 const createPool = require('./pool')
 

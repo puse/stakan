@@ -9,7 +9,6 @@ const pool = createPool()
 test('send', async t => {
   const ws = await pool.acquire()
 
-  await Remote
+  return Remote
     .subscribe(ws, 'btc-usd')
-    .then(console.log)
 })

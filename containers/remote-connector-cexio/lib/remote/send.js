@@ -1,4 +1,4 @@
-const debug = require('debug')('stakan:source:cexio')
+const debug = require('debug')('stakan:connector:cexio')
 
 const { ulid } = require('ulid')
 
