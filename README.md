@@ -3,18 +3,16 @@
 Realtime orderbook data streams.
 
 - Expose MQTT channels
-  - `orderbook/{market}/{symbol}`.
-  - `ticker/{market}/{symbol}`.
+  - `{market}/{symbol}`.
 
 Markets
 
 - `cexio`
+- `bitfinex`
 
 Symbols
 
 - `btc-usd`
-- `btc-eur`
-- `dash-usd`
 - `eth-usd`
 
 ## Usage
@@ -32,11 +30,11 @@ docker-compose up
 
 ## Tech. Stack
 
-- Mosquitto as MQTT broker
-- Redis as data store with custom Lua scripting
-- Node.js for data processing
-  - Utilizes RxJS for internal stream representation
-- Kafka for streams with Lenses UI
-- Elasticsearch as analytical database 
+- [x] Mosquitto as MQTT broker
+- [x] Redis as data store with custom Lua scripting
+- [x] Node.js for data processing
+  - [x] Utilizes RxJS for internal stream representation
+- [ ] Kafka for streams with Lenses UI
+- [ ] Elasticsearch as analytical database 
 
 Front-end is made using Vue.js/Vuex
