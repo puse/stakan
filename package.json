@@ -1,6 +1,16 @@
 {
-  "devDependencies": {
-    "lerna": "^3.5.1"
+  "name": "stakan",
+  "scripts": {
+    "test": "nyc lerna run test"
   },
-  "name": "stakan"
+  "devDependencies": {
+    "lerna": "^3.5.1",
+    "nyc": "^13.1.0"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
+  }
 }
