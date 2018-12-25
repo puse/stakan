@@ -5,22 +5,28 @@
         el-breadcrumb-item {{ broker }}
         el-breadcrumb-item {{ symbol }}
 
-      el-time.float-right(
-        prefix="Updated"
-        :display-relative="true"
-        :value="updateTime$")
+      div.float-right
+        el-button(
+          size="small"
+          icon="el-icon-caret-bottom"
+          type="danger")
+          | {{ticker.bid.price}}
+
+        el-button(
+          size="small"
+          icon="el-icon-caret-top"
+          type="success")
+          | {{ticker.ask.price}}
 
     el-row(v-if="snapshot$"
       :gutter="20")
 
       el-col(:span="12")
-        h3 Sell orders
 
         l2-table(side="bids"
           :members="orders.bids")
 
       el-col(:span="12")
-        h3 Buy orders
 
         l2-table(side="asks"
           :members="orders.asks")
@@ -29,11 +35,6 @@
 <script src="./main.js"></script>
 
 <style scoped>
-h3 {
-  font-weight: normal;
-  color: #666;
-}
-
 .el-breadcrumb {
   display: inline-block;
 }
@@ -41,5 +42,7 @@ h3 {
 .status-bar {
   padding: 15px 0;
   border-bottom: 1px solid #ddd;
+  margin-bottom: 25px;
 }
+
 </style>
