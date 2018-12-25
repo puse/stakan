@@ -1,7 +1,5 @@
 const Router = require('koa-router')
 
-const composeM = require('koa-compose')
-
 const { l2depth } = require('@stakan/db-methods')
 
 function read () {
@@ -11,14 +9,11 @@ function read () {
 }
 
 function main () {
-  const router = new Router({ prefix: '/l2' })
+  const router = new Router()
 
   router.get('/:broker/:symbol', read())
 
-  return composeM([
-    router.routes(),
-    router.allowedMethods()
-  ])
+  return router
 }
 
 module.exports = main

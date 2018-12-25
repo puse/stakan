@@ -1,9 +1,5 @@
 {
   "verbose": true,
-  "watch": [
-    "lib/",
-    "server.js"
-  ],
   "env": {
     "NODE_ENV": "development",
     "DEBUG": "stakan:*",

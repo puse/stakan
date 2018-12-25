@@ -3,7 +3,7 @@ import Poll from '@stakan/l2-poll'
 import { Subject } from 'rxjs/Rx'
 
 const CONFIG = {
-  http: { baseURL: '/api/l2' },
+  http: { baseURL: '/api' },
   mqtt: { url: 'ws://localhost:9001' }
 }
 

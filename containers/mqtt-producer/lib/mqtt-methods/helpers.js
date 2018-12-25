@@ -2,11 +2,12 @@
  * Helpers
  */
 
-const topicOf = ({ scope, broker, symbol }) =>
-  `${scope}/${broker}/${symbol}`
+const topicOf = ({ broker, symbol }) =>
+  `${broker}/${symbol}`
 
-const serialize = payload =>
-  JSON.stringify(payload)
+const serialize = payload => {
+  return JSON.stringify(payload)
+}
 
 /**
  * Expose
