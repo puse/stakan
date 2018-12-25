@@ -2,9 +2,11 @@ import Poll from '@stakan/l2-poll'
 
 import { Subject } from 'rxjs/Rx'
 
+const { origin, hostname } = location
+
 const CONFIG = {
-  http: { baseURL: '/api' },
-  mqtt: { url: 'ws://localhost:9001' }
+  http: { baseURL: `${origin}/api` },
+  mqtt: { url: `ws://${hostname}:9001` }
 }
 
 function subscriptions () {
