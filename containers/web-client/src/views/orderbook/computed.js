@@ -1,4 +1,5 @@
 import {
+  head,
   applySpec,
   compose,
   prop,
@@ -60,11 +61,21 @@ function orders () {
   return from(snapshot$.rows)
 }
 
+function ticker () {
+  const { bids = [], asks = [] } = this.orders
+
+  const bid = head(bids) || {}
+  const ask = head(asks) || {}
+
+  return { bid, ask }
+}
+
 /**
  * Expose
  */
 
 export {
   topic,
-  orders
+  orders,
+  ticker
 }
