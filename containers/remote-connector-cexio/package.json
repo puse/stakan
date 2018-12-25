@@ -4,7 +4,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "ava -v",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "@stakan/db-methods": "*",
