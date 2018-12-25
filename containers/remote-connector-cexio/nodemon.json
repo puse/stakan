@@ -1,0 +1,15 @@
+{
+  "verbose": true,
+  "watch": [
+    "lib/",
+    "server.js"
+  ],
+  "env": {
+    "NODE_ENV": "development",
+    "DEBUG": "stakan:*",
+    "REDIS_URL": "redis://localhost:6379",
+    "CEXIO_API_KEY": "lT8rhvimwK7R4IyJfXNjWNMu140",
+    "CEXIO_API_SECRET": "5ATNU7Xm3UYZhGThIoAXiMTD4",
+    "SYMBOL": "btc-usd"
+  }
+}

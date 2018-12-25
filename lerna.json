@@ -2,7 +2,10 @@
   "packages": [
     "packages/*",
     "containers/web-client",
-    "containers/orderbook"
+    "containers/http-server",
+    "containers/mqtt-producer",
+    "containers/remote-connector-cexio",
+    "containers/remote-connector-bitfinex"
   ],
   "version": "independent"
 }
