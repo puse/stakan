@@ -11,16 +11,15 @@
   "dependencies": {
     "@stakan/db-methods": "*",
     "@stakan/redis": "*",
-    "@stakan/rx-l2-buffer": "*",
     "benchmark": "^2.1.4",
-    "bitfinex-api-node": "^2.0.4",
-    "daggy": "^1.3.0",
     "debug": "^4.1.1",
-    "generic-pool": "^3.4.2",
     "getenv": "^0.7.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.3.3",
-    "rxjs-compat": "^6.3.3",
-    "ws": "^6.1.2"
+    "rxjs-compat": "^6.3.3"
+  },
+  "devDependencies": {
+    "bitfinex-api-node": "^2.0.4",
+    "daggy": "^1.3.0"
   }
 }

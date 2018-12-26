@@ -1,6 +1,6 @@
 const getenv = require('getenv')
 
-const { Observable } = require('rxjs/Rx')
+const R = require('ramda')
 
 const Bfx = require('bitfinex-api-node')
 
@@ -12,8 +12,6 @@ const {
 } = require('@stakan/db-methods')
 
 const Subscription = require('./lib/subscription')
-
-const { convertSymbol } = require('./lib/conversions')
 
 const compat = require('./compat')
 
@@ -29,6 +27,25 @@ const SETTINGS = {
     seqAudit: true,
     packetWDDelay: 10 * 1000
   }
+}
+
+/**
+ * Helpers
+ */
+
+const convertSymbol = symbol => {
+  // btc-usd -> [btc, usd]
+  const toPair = R.split('-')
+  // [btc, usd] -> [BTC, USD]
+  const toUpperEach = R.map(R.toUpper)
+  // [BTC, USD] -> BTCUSD
+  const join = R.reduce(R.concat, '')
+  // BTCUSD -> tBTCUSD
+  const prefix = R.concat('t')
+
+  const convert = R.compose(prefix, join, toUpperEach, toPair)
+
+  return convert(symbol)
 }
 
 /**
