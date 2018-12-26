@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava -vw test/*.spec.js",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
@@ -11,6 +11,7 @@
     "@stakan/db-methods": "*",
     "@stakan/redis": "*",
     "@stakan/rx-l2-buffer": "*",
+    "bitfinex-api-node": "^2.0.4",
     "debug": "^4.1.1",
     "generic-pool": "^3.4.2",
     "getenv": "^0.7.0",
