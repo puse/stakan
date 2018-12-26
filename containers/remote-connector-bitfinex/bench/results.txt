@@ -1,0 +1,5 @@
+Pipeline
+  raw x 10,447 ops/sec ±0.74% (78 runs sampled)
+  current x 3,676 ops/sec ±0.64% (80 runs sampled)
+  next x 3,928 ops/sec ±0.40% (82 runs sampled)
+  nextTypes x 2,161 ops/sec ±1.08% (82 runs sampled)
