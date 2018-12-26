@@ -2,8 +2,6 @@ const R = require('ramda')
 
 const Op = require('rxjs/operators')
 
-const C = require('./lib/conversions')
-
 const rowFrom = raw => {
   const [ price, count, qty ] = raw
 
