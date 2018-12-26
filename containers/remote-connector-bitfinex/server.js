@@ -2,6 +2,8 @@ const getenv = require('getenv')
 
 const { Observable } = require('rxjs/Rx')
 
+const Bfx = require('bitfinex-api-node')
+
 const Redis = require('@stakan/redis')
 
 const {
@@ -9,13 +11,25 @@ const {
   l2commit
 } = require('@stakan/db-methods')
 
-const Source = require('./lib')
+const Subscription = require('./lib/subscription')
+
+const { convertSymbol } = require('./lib/conversions')
+
+const compat = require('./compat')
 
 /**
  * Settings
  */
 
 const SYMBOL = getenv('SYMBOL')
+
+const SETTINGS = {
+  ws: {
+    autoReconnect: false,
+    seqAudit: true,
+    packetWDDelay: 10 * 1000
+  }
+}
 
 /**
  * Init
@@ -36,10 +50,18 @@ const consume = patch => {
 
   return add().then(commit)
 }
+
 /**
  *
  */
 
-Source(SYMBOL)
-  .retry(Infinity)
+const recover = compat({
+  broker: 'bitfinex',
+  symbol: SYMBOL
+})
+
+const bfx = new Bfx(SETTINGS)
+
+Subscription(bfx.ws(), convertSymbol(SYMBOL))
+  .pipe(recover)
   .subscribe(consume)

@@ -4,8 +4,6 @@ const R = require('ramda')
 
 const { Observable } = require('rxjs/Rx')
 
-const Bfx = require('bitfinex-api-node')
-
 const { onceThen } = require('./helpers')
 
 /**
@@ -56,11 +54,7 @@ const subscribeOrderBook = (ws, symbol, emit) => {
  *
  */
 
-function main (opts, symbol) {
-  const settings = R.merge(DEFAULT_OPTIONS, opts)
-
-  const bfx = new Bfx(settings)
-
+function main (ws, symbol) {
   const listen = observer => {
     const emit = level => observer.next(level)
 
@@ -75,8 +69,6 @@ function main (opts, symbol) {
     }
 
     // init and go
-
-    const ws = bfx.ws()
 
     ws.on('error', report)
       .on('close', complete)
