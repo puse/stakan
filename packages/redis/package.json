@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@stakan/redis-scripts": "*",
-    "ioredis": "^4.2.0"
+    "ioredis": "^4.2.0",
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "ava": "^0.25.0"

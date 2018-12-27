@@ -1,5 +1,7 @@
 const { tagged } = require('daggy')
 
+const R = require('ramda')
+
 /**
  * Constants
  */
@@ -11,6 +13,20 @@ const FIELDS = ['price', 'quantity']
  */
 
 const Level = tagged('Level', FIELDS)
+
+/**
+ * Static methods
+ */
+
+Level.toPairs = R.toPairs
+
+/**
+ * Prototype methods
+ */
+
+Level.prototype.toPairs = function () {
+  return Level.toPairs(this)
+}
 
 // Expose
 

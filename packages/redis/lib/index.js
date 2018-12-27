@@ -1,5 +1,7 @@
 const Redis = require('ioredis')
 
+const R = require('ramda')
+
 const scripts = require('@stakan/redis-scripts')
 
 /**
