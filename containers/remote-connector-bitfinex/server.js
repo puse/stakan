@@ -1,21 +1,42 @@
 const getenv = require('getenv')
 
-const { Observable } = require('rxjs/Rx')
+const R = require('ramda')
 
 const Redis = require('@stakan/redis')
+
+const Remote = require('@stakan/source-remote-bitfinex/lib/remote')
 
 const {
   l2add,
   l2commit
 } = require('@stakan/db-methods')
 
-const Source = require('./lib')
+const compat = require('./compat')
 
 /**
  * Settings
  */
 
 const SYMBOL = getenv('SYMBOL')
+
+/**
+ * Helpers
+ */
+
+const convertSymbol = symbol => {
+  // btc-usd -> [btc, usd]
+  const toPair = R.split('-')
+  // [btc, usd] -> [BTC, USD]
+  const toUpperEach = R.map(R.toUpper)
+  // [BTC, USD] -> BTCUSD
+  const join = R.reduce(R.concat, '')
+  // BTCUSD -> tBTCUSD
+  const prefix = R.concat('t')
+
+  const convert = R.compose(prefix, join, toUpperEach, toPair)
+
+  return convert(symbol)
+}
 
 /**
  * Init
@@ -36,10 +57,17 @@ const consume = patch => {
 
   return add().then(commit)
 }
+
 /**
  *
  */
 
-Source(SYMBOL)
-  .retry(Infinity)
+const recover = compat({
+  broker: 'bitfinex',
+  symbol: SYMBOL
+})
+
+Remote()
+  .observe(convertSymbol(SYMBOL))
+  .pipe(recover)
   .subscribe(consume)
