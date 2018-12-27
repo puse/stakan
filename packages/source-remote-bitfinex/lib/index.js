@@ -2,7 +2,7 @@ const Bfx = require('bitfinex-api-node')
 
 const Remote = require('./remote')
 
-const { Symbol, Level } = require('./types')
+const { convertSymbol, recoverLevel } = require('./conversions')
 
 /**
  * Setup
@@ -11,13 +11,10 @@ const { Symbol, Level } = require('./types')
 function Source (opts = {}) {
   const remote = Remote(opts)
 
-  //
-  const observe = x => {
-    const symbol = Symbol.fromString(x)
-
+  const observe = symbol => {
     return remote
-      .observe(symbol.toString('bitfinex'))
-      .map(Level.fromBitfinex)
+      .observe(convertSymbol(symbol))
+      .map(recoverLevel)
   }
 
   return { observe }

@@ -14,8 +14,8 @@
   "author": "Mushegh Antaranyan",
   "license": "MIT",
   "dependencies": {
+    "@stakan/types": "*",
     "bitfinex-api-node": "^2.0.4",
-    "daggy": "^1.3.0",
     "debug": "^4.1.1",
     "ramda": "^0.26.1",
     "rxjs": "^6.3.3",
