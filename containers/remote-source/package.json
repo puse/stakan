@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/remote-connector-bitfinex",
+  "name": "@stakan/remote-source",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
@@ -10,11 +10,10 @@
     "@stakan/db-methods": "*",
     "@stakan/redis": "*",
     "@stakan/source-remote-bitfinex": "*",
+    "@stakan/types": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
-    "ramda": "^0.26.1",
-    "rxjs": "^6.3.3",
-    "rxjs-compat": "^6.3.3"
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "ava": "^1.0.1"

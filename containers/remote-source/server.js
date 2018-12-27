@@ -1,20 +1,18 @@
 const getenv = require('getenv')
 
-const R = require('ramda')
-
 const Redis = require('@stakan/redis')
 
-const Source = require('@stakan/source-remote-bitfinex')
-
+const Source = require('./lib/source')
 const Sink = require('./lib/sink')
 
 /**
  * Settings
  */
 
+const BROKER = getenv('BROKER')
 const SYMBOL = getenv('SYMBOL')
 
-const TOPIC = `bitfinex/${SYMBOL}`
+const TOPIC = `${BROKER}/${SYMBOL}`
 
 /**
  * Helpers
@@ -26,10 +24,7 @@ const TOPIC = `bitfinex/${SYMBOL}`
 
 const db = new Redis()
 
-const source = Source()
+const source = Source({ broker: BROKER, symbol: SYMBOL })
 const sink = Sink(db, TOPIC)
 
-source
-  .observe(SYMBOL)
-  // .map(R.tap(console.log))
-  .subscribe(sink)
+source.subscribe(sink)

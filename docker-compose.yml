@@ -17,64 +17,44 @@ services:
 
   #
 
-  http-server:
-    build: ./containers/http-server
-    links:
-      - redis
-    environment:
-      - ENV=production
-      - REDIS_URL=redis://redis:6379
-      - NODE_PORT=80
-    ports:
-      - "8080:80"
+  # http-server:
+  #   build: ./containers/http-server
+  #   links:
+  #     - redis
+  #   environment:
+  #     - ENV=production
+  #     - REDIS_URL=redis://redis:6379
+  #     - NODE_PORT=80
+  #   ports:
+  #     - "8080:80"
+  #
+  # mqtt-producer:
+  #   build: ./containers/mqtt-producer
+  #   links:
+  #     - redis
+  #     - mosquitto
+  #   environment:
+  #     - ENV=production
+  #     - REDIS_URL=redis://redis:6379
+  #     - MQTT_URL=mqtt://mosquitto:1883
 
-  mqtt-producer:
-    build: ./containers/mqtt-producer
-    links:
-      - redis
-      - mosquitto
-    environment:
-      - ENV=production
-      - REDIS_URL=redis://redis:6379
-      - MQTT_URL=mqtt://mosquitto:1883
-
-  remote-connector-cexio-btc-usd:
-    build: ./containers/remote-connector-cexio
+  remote-source-bitfinex-btc-usd:
+    build: ./containers/remote-source
     links:
       - redis
     environment:
       - ENV=production
       - REDIS_URL=redis://redis:6379
-      - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
-      - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
+      - BROKER=bitfinex
       - SYMBOl=btc-usd
 
-  remote-connector-cexio-eth-usd:
-    build: ./containers/remote-connector-cexio
+  remote-source-bitfinex-eth-usd:
+    build: ./containers/remote-source
     links:
       - redis
     environment:
       - ENV=production
       - REDIS_URL=redis://redis:6379
-      - CEXIO_API_KEY=lT8rhvimwK7R4IyJfXNjWNMu140
-      - CEXIO_API_SECRET=5ATNU7Xm3UYZhGThIoAXiMTD4
-      - SYMBOL=eth-usd
-
-  remote-connector-bitfinex-btc-usd:
-    build: ./containers/remote-connector-bitfinex
-    links:
-      - redis
-    environment:
-      - ENV=production
-      - REDIS_URL=redis://redis:6379
-      - SYMBOl=btc-usd
-
-  remote-connector-bitfinex-eth-usd:
-    build: ./containers/remote-connector-bitfinex
-    links:
-      - redis
-    environment:
-      - ENV=production
-      - REDIS_URL=redis://redis:6379
+      - BROKER=bitfinex
       - SYMBOl=eth-usd
 

@@ -17,7 +17,9 @@ function Source (opts = {}) {
       .map(recoverLevel)
   }
 
-  return { observe }
+  return {
+    observe
+  }
 }
 
 module.exports = Source
