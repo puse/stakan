@@ -1,3 +1,20 @@
+const R = require('ramda')
+
+/**
+ * Settings
+ */
+
+const MAXLEN = 1000
+
+/**
+ * Helpers
+ */
+
+const argsFromLevel = R.compose(
+  R.flatten,
+  R.toPairs
+)
+
 const seqGen = (session = Date.now()) => {
   let i = 1
   return () => `${session}-${i++}`
@@ -13,9 +30,10 @@ function Sink (db, topic) {
 
   const next = (level) => {
     const id = seq()
-    const pairs = level.toPairs()
+    const args = argsFromLevel(level)
+    const limited = ['MAXLEN', '~', MAXLEN]
 
-    db.xadd(key, id, pairs)
+    db.xadd(key, ...limited, id, ...args)
       .catch(errorHandler)
   }
 
