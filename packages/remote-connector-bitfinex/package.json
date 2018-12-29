@@ -1,0 +1,21 @@
+{
+  "name": "@stakan/remote-connector-bitfinex",
+  "version": "0.0.1",
+  "description": "Remote connector for Bitfinex",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "ava -v"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bitfinex-api-node": "^2.0.4",
+    "debug": "^4.1.1",
+    "generic-pool": "^3.4.2",
+    "ramda": "^0.26.1",
+    "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3"
+  },
+  "devDependencies": {
+    "ava": "^1.0.1"
+  }
+}
