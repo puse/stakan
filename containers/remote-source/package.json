@@ -7,12 +7,10 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@stakan/db-methods": "*",
-    "@stakan/redis": "*",
     "@stakan/source-remote-bitfinex": "*",
-    "@stakan/types": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
+    "ioredis": "^4.3.0",
     "ramda": "^0.26.1"
   },
   "devDependencies": {

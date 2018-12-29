@@ -1,6 +1,6 @@
 const getenv = require('getenv')
 
-const Redis = require('@stakan/redis')
+const Redis = require('ioredis')
 
 const Source = require('./lib/source')
 const Sink = require('./lib/sink')
@@ -9,10 +9,12 @@ const Sink = require('./lib/sink')
  * Settings
  */
 
-const BROKER = getenv('BROKER')
-const SYMBOL = getenv('SYMBOL')
+const REDIS_URL = getenv('REDIS_URL', 'redis://localhost:6379')
 
-const TOPIC = `${BROKER}/${SYMBOL}`
+const TOPIC = getenv.multi({
+  broker: 'BROKER',
+  symbol: 'SYMBOL'
+})
 
 /**
  * Helpers
@@ -22,9 +24,9 @@ const TOPIC = `${BROKER}/${SYMBOL}`
  * Init
  */
 
-const db = new Redis()
+const db = new Redis(REDIS_URL)
 
-const source = Source({ broker: BROKER, symbol: SYMBOL })
+const source = Source(TOPIC)
 const sink = Sink(db, TOPIC)
 
 source

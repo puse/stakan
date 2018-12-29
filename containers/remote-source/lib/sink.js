@@ -10,9 +10,14 @@ const MAXLEN = 1000
  * Helpers
  */
 
-const argsFromLevel = R.compose(
+const arrFromLevel = R.compose(
   R.flatten,
   R.toPairs
+)
+
+const keyFromTopic = R.compose(
+  R.join('/'),
+  R.props(['broker', 'symbol'])
 )
 
 const seqGen = (session = Date.now()) => {
@@ -25,12 +30,12 @@ const errorHandler = err => {
 }
 
 function Sink (db, topic) {
-  const key = String(topic)
+  const key = keyFromTopic(topic)
   const seq = seqGen()
 
   const next = (level) => {
     const id = seq()
-    const args = argsFromLevel(level)
+    const args = arrFromLevel(level)
     const limited = ['MAXLEN', '~', MAXLEN]
 
     db.xadd(key, ...limited, id, ...args)
