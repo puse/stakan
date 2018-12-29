@@ -1,28 +1,21 @@
 import test from 'ava'
 
-import { Level, Symbol } from '@stakan/types'
-
-import * as C from '../lib/conversions'
+import { Symbol, Level } from '../lib/conversions'
 
 test('convertSymbol', t => {
-  const symbol = Symbol('btc', 'usd')
-  t.is(C.convertSymbol(symbol), 'tBTCUSD')
+  t.is(Symbol.convert('btc-usd'), 'tBTCUSD')
 })
 
 test('recoverLevel', t => {
-  const level = C.recoverLevel([4880, 2, -3])
-
-  t.true(Level.is(level), 'type')
-
   t.deepEqual(
-    level,
-    Level(4880, -3),
+    Level.recover([4880, 2, -3]),
+    { price: 4880, quantity: -3 },
     'value'
   )
 
   t.deepEqual(
-    C.recoverLevel([4880, 0, -1]),
-    Level(4880, 0),
+    Level.recover([4880, 0, -1]),
+    { price: 4880, quantity: 0 },
     'nil value'
   )
 })

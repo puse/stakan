@@ -10,7 +10,7 @@ function Source (topic) {
     throw new Error(message)
   }
 
-  return Connector().observe(symbol)
+  return Connector(symbol)
 }
 
 module.exports = Source

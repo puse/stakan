@@ -1,2 +1,2 @@
-module.exports.recoverLevel = require('./recover-level')
-module.exports.convertSymbol = require('./convert-symbol')
+module.exports.Symbol = require('./symbol')
+module.exports.Level = require('./level')

@@ -27,4 +27,6 @@ const db = new Redis()
 const source = Source({ broker: BROKER, symbol: SYMBOL })
 const sink = Sink(db, TOPIC)
 
-source.subscribe(sink)
+source
+  .observe()
+  .subscribe(sink)

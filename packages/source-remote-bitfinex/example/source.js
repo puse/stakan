@@ -1,12 +1,6 @@
 const Source = require('..')
 
-const { Symbol } = require('@stakan/types')
-
-const source = Source()
-
-const symbol = Symbol('btc', 'usd')
-
-source
-  .observe(symbol)
+Source('btc-usd')
+  .observe()
   .take(100)
   .subscribe(console.log)

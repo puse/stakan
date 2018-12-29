@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import H from '../lib/remote/helpers'
+import H from '../lib/helpers'
 
 test('onceThen', t => {
   const f = x => x + 1

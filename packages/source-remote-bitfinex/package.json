@@ -1,7 +1,7 @@
 {
   "name": "@stakan/source-remote-bitfinex",
   "version": "0.0.1",
-  "description": "Observable orderbook for Bitfinex",
+  "description": "Observable orderbook levels for Bitfinex",
   "main": "lib/index.js",
   "scripts": {
     "test": "ava -v test/**/*.spec.js"
@@ -14,9 +14,9 @@
   "author": "Mushegh Antaranyan",
   "license": "MIT",
   "dependencies": {
-    "@stakan/types": "*",
     "bitfinex-api-node": "^2.0.4",
     "debug": "^4.1.1",
+    "getenv": "^0.7.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.3.3",
     "rxjs-compat": "^6.3.3"

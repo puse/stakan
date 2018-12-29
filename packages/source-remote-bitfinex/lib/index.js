@@ -1,25 +1,22 @@
 const Bfx = require('bitfinex-api-node')
 
-const Remote = require('./remote')
+const { Observable } = require('rxjs/Rx')
 
-const { convertSymbol, recoverLevel } = require('./conversions')
+const Client = require('./client')
+
+const connect = require('./connector')
 
 /**
  * Setup
  */
 
-function Source (opts = {}) {
-  const remote = Remote(opts)
+function Source (symbol) {
+  const observe = () =>
+    Observable
+      .fromPromise(Client.create())
+      .flatMap(connect(symbol))
 
-  const observe = symbol => {
-    return remote
-      .observe(convertSymbol(symbol))
-      .map(recoverLevel)
-  }
-
-  return {
-    observe
-  }
+  return { observe }
 }
 
 module.exports = Source
