@@ -1,0 +1,10 @@
+{
+  "name": "@stakan/source-remote",
+  "version": "0.0.1",
+  "description": "Source remote (multi-broker)",
+  "main": "lib/index.js",
+  "dependencies": {
+    "@stakan/remote-connector-bitfinex": "*",
+    "ramda": "^0.26.1"
+  }
+}
