@@ -1,11 +1,19 @@
-# remote-connector
+# lika
 
-## API
+`LevelRecord` producer, sourcing remote broker
+
+## Usage
+
+#### Install
+
+```sh
+npm install @stakan/lika
+```
 
 #### Example
 
 ```js
-const Source = require('@stakan/source-remote')
+const Source = require('@stakan/lika')
 
 const config = void 0
 

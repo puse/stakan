@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/remote-source",
+  "name": "@stakan/komube",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
@@ -7,7 +7,7 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@stakan/source-remote-bitfinex": "*",
+    "@stakan/remote-client-bitfinex": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
     "ioredis": "^4.3.0",

@@ -285,6 +285,7 @@ function Pool (opts = CONFIG) {
     destroy,
     validate
   }
+
   return createPool(factory, opts)
 }
 

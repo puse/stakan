@@ -38,8 +38,8 @@ services:
   #     - REDIS_URL=redis://redis:6379
   #     - MQTT_URL=mqtt://mosquitto:1883
 
-  remote-source-bitfinex-btc-usd:
-    build: ./containers/remote-source
+  komube-bitfinex-btc-usd:
+    build: ./containers/komube
     links:
       - redis
     environment:
@@ -48,8 +48,8 @@ services:
       - BROKER=bitfinex
       - SYMBOl=btc-usd
 
-  remote-source-bitfinex-eth-usd:
-    build: ./containers/remote-source
+  komube-bitfinex-eth-usd:
+    build: ./containers/komube
     links:
       - redis
     environment:
@@ -57,4 +57,3 @@ services:
       - REDIS_URL=redis://redis:6379
       - BROKER=bitfinex
       - SYMBOl=eth-usd
-
