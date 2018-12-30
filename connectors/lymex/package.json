@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/liay",
+  "name": "@stakan/lymex",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
@@ -7,14 +7,14 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@stakan/lika": "*",
-    "@stakan/akay": "*",
+    "@stakan/lymo": "*",
+    "@stakan/omex": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
-    "ioredis": "^4.3.0",
-    "ramda": "^0.26.1"
+    "ioredis": "^4.3.0"
   },
   "devDependencies": {
-    "ava": "^1.0.1"
+    "ava": "^1.0.1",
+    "nodemon": "^1.18.9"
   }
 }

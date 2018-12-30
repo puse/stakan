@@ -1,10 +1,10 @@
 {
   "packages": [
     "packages/*",
+    "connectors/*",
     "containers/web-client",
     "containers/http-server",
-    "containers/mqtt-producer",
-    "containers/likaxxxx"
+    "containers/mqtt-producer"
   ],
   "version": "independent"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/lika",
+  "name": "@stakan/lymo",
   "version": "0.0.1",
   "description": "Source remote (multi-broker)",
   "main": "lib/index.js",

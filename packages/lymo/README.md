@@ -1,4 +1,4 @@
-# lika
+# lymo
 
 `LevelRecord` producer, sourcing remote broker
 
@@ -7,7 +7,7 @@
 #### Install
 
 ```sh
-npm install @stakan/lika
+npm install @stakan/lymo
 ```
 
 #### Example

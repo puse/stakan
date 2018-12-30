@@ -38,8 +38,8 @@ services:
   #     - REDIS_URL=redis://redis:6379
   #     - MQTT_URL=mqtt://mosquitto:1883
 
-  komube-bitfinex-btc-usd:
-    build: ./containers/komube
+  lymex-bitfinex-btc-usd:
+    build: ./connectors/lymex
     links:
       - redis
     environment:
@@ -48,8 +48,8 @@ services:
       - BROKER=bitfinex
       - SYMBOl=btc-usd
 
-  komube-bitfinex-eth-usd:
-    build: ./containers/komube
+  lymex-bitfinex-eth-usd:
+    build: ./connectors/lymex
     links:
       - redis
     environment:
