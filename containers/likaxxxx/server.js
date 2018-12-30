@@ -2,7 +2,7 @@ const getenv = require('getenv')
 
 const Redis = require('ioredis')
 
-const Source = require('./lib/source')
+const Source = require('@stakan/lika')
 const Sink = require('./lib/sink')
 
 /**
@@ -26,9 +26,9 @@ const TOPIC = getenv.multi({
 
 const db = new Redis(REDIS_URL)
 
-const source = Source(TOPIC)
 const sink = Sink(db, TOPIC)
 
-source
-  .observe()
-  .subscribe(sink)
+console.log(TOPIC)
+
+Source({}, TOPIC)
+  .subscribe(console.log)
