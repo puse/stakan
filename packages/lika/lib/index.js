@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const stamp = require('./stamp')
+
 const connectors = require('./connectors')
 
 /**
@@ -18,7 +20,9 @@ function Source (config, topic) {
     throw new RangeError(message)
   }
 
-  return Connector(config).observeOrderBookLevels(symbol)
+  return Connector(config)
+    .observeOrderBookLevels(symbol)
+    .pipe(stamp())
 }
 
 /**

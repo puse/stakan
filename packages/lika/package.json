@@ -1,10 +1,11 @@
 {
-  "name": "@stakan/source-remote",
+  "name": "@stakan/lika",
   "version": "0.0.1",
   "description": "Source remote (multi-broker)",
   "main": "lib/index.js",
   "dependencies": {
     "@stakan/remote-connector-bitfinex": "*",
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "rxjs": "^6.3.3"
   }
 }
