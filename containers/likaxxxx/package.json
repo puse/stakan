@@ -1,5 +1,5 @@
 {
-  "name": "@stakan/komube",
+  "name": "@stakan/liay",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@stakan/lika": "*",
+    "@stakan/akay": "*",
     "debug": "^4.1.1",
     "getenv": "^0.7.0",
     "ioredis": "^4.3.0",

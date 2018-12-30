@@ -3,7 +3,7 @@ const getenv = require('getenv')
 const Redis = require('ioredis')
 
 const Source = require('@stakan/lika')
-const Sink = require('./lib/sink')
+const Sink = require('@stakan/akay')
 
 /**
  * Settings
@@ -31,4 +31,4 @@ const sink = Sink(db, TOPIC)
 console.log(TOPIC)
 
 Source({}, TOPIC)
-  .subscribe(console.log)
+  .subscribe(sink)
