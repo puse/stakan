@@ -1,6 +1,7 @@
 {
   "packages": [
     "packages/*",
+    "packages-next/*",
     "connectors/*",
     "containers/web-client",
     "containers/http-server",
