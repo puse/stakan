@@ -8,9 +8,15 @@ const connectors = require('./connectors')
  * Remote
  */
 
-function Source (config, topic) {
-  if (!R.is(Source, this)) return new Source(config, topic)
+/**
+ * Source
+ *
+ * @param {Object} config
+ * @param {Object} topic
+ * @returns {Observable}
+ */
 
+function Source (config, topic) {
   const { broker, symbol } = topic
 
   const Connector = connectors[broker]
