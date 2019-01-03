@@ -1,0 +1,5 @@
+[ { "session": 1, "offset": 1, "price": 450, "quantity": 2 },
+  { "session": 1, "offset": 2, "price": 452, "quantity": -2 },
+  { "session": 1, "offset": 3, "price": 451, "quantity": 1 },
+  { "session": 1, "offset": 4, "price": 450, "quantity": 0 },
+  { "session": 1, "offset": 5, "price": 451, "quantity": 2 } ]
