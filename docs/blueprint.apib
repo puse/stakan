@@ -1,0 +1,204 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# Data API
+
+This is a working draft of server API for data aquisition and signal processing.
+
+
+## Security
+
+[JSON Web Tokens](https://jwt.io/) will be used with `Bearer` mechanism to for
+client authorization and access control.
+
+Means all the following requests **MUST** include a proper header or should fail
+with error 401 `Unauthorized`.
+
+Sample header configuration:
+
+    `Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.b75wNqAmiuEJLlcURhvvE9ffv9QVH7XfpIcvYbXWNbQ`
+
+
+## Status codes
+
+- 200 `OK` - the request was successful (some API calls may return 201 instead).
+- 201 `Created` - the request was successful and a resource was created.
+- 204 `No Content` - the request was successful but there is no representation to return (i.e. the response is empty).
+- 400 `Bad Request` - the request could not be understood or was missing required parameters.
+- 401 `Unauthorized` - authentication failed or user doesn't have permissions for requested operation.
+- 404 `Not Found` - resource was not found.
+- 405 `Method Not Allowed` - requested method is not supported for resource.
+- 422 `Unprocessable Entity` - request could not be understood by the server due to malformed syntax.
+
+
+## Common schemata
+
+### Subject
+
+*noun*  
+The central substance that is being discussed, described, or dealt with.
+
+- `broker` - Remote exchange market identifier
+- `symbol` - Currency pair in `{base}-{quote}` format
+
+### Correlation
+
+*noun*  
+A mutual relationship or connection between two or more things.
+
+- `cid` - Correlation id
+- `rev` - Revision number
+
+
+# Group Orderbook
+
+Endpoints for orderbook level 2 aggregations
+
+## Orderbook [/l2/{broker}/{symbol}]
+
+Current orderbook.
+
++ Parameters
+    - broker: `binance` (string)
+    - symbol: `btc-usd` (string)
+
++ Attributes (Subject)
+    + Include Correlation
+    - rows (array[Orderbook Row])
+
+### Get orderbook snapshot [GET]
+
+Get current snapshot of given subject
+
++ Response 200 (application/json)
+
+    Successfully resolve
+
+    + Attributes (Orderbook)
+
++ Response 404
+
+    Fail if no data for that subject
+
+    + Body
+
+
+# Group Ticker
+
+Endpoints for ticker
+
+## Ticker [/ticker/{broker}/{symbol}]
+
+Current orderbook.
+
++ Parameters
+    - broker: `binance` (string)
+    - symbol: `btc-usd` (string)
+
++ Attributes (Subject)
+    + Include Ticker Data
+
+### Get ticker [GET]
+
+Get current snapshot of given subject
+
++ Response 200 (application/json)
+
+    Successfully resolve
+
+    + Attributes (Ticker)
+
++ Response 404
+
+    Fail if no data for that subject
+
+    + Body
+
+
+# Group Candles
+
+Endpoints for orderbook level 2 aggregations
+
+## Candle [/ohlc/{broker}/{symbol}]
+
++ Parameters
+    - broker: `binance` (string)
+    - symbol: `btc-usd` (string)
+
++ Attributes (Subject)
+    + Include Correlation
+    + Include Candlestick Data
+
+## Get last candle [GET]
+
+Get current snapshot of given subject
+
++ Response 200 (application/json)
+
+    Successfully resolve
+
+    + Attributes (Candle)
+
++ Response 404
+
+    Fail if no data for that subject
+
+    + Body
+
+# Data structures
+
+## Subject
+
+- broker: `binance` (string)
+- symbol: `btc-usd` (string)
+
+## Correlation (object)
+
+- cid: `1544227069116` (number)
+- rev: `5` (number)
+
+## Orderbook Row (object)
+
+- side: `bids` (enum[string])
+
+    Buying or selling
+
+    + Members
+        - `bids`
+        - `asks`
+
+- price: `3425.5` (number)
+
+    Price level
+
+- amount: `0.88` (number)
+
+    Amount at given price level, can be zero
+
+## Ticker Data (object)
+
+- bid: `3424.8` (number)
+
+    Highest buy order
+
+- ask: `3425` (number)
+
+    Lowest sell order
+
+## Candlestick Data (object)
+
+- open: `3422.1` (number)
+
+    First execution during the time frame
+
+- close: `3430.6` (number)
+
+    Last execution during the time frame
+
+- high: `3435.4` (number)
+
+    Highest execution during the time frame
+
+- low: `3422.1` (number)
+
+    Lowest execution during the time frame
